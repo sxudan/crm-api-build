@@ -1,0 +1,40 @@
+{
+    "name": "crm-api",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/sxudan/crm",
+    "author": "sudan <sudosuwal@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "nodemon dist/app.js",
+        "watch": "nodemon --watch 'src/**/*.ts' --exec 'tsc && node dist/app.js'",
+        "dev": "nodemon --exec ts-node src/app.ts",
+        "prisma:seed": "ts-node ./prisma/seed.ts",
+        "prisma:migrate": "cd prisma && prisma migrate dev --name init",
+        "prisma:generate": "prisma generate",
+        "build": "tsc --project tsconfig.json",
+        "validate": "prettier ./src --check && tsc -project tsconfig.json",
+        "validate-fix": "prettier ./src --write && tsc -project tsconfig.json",
+        "postinstall": "prisma generate"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/jsonwebtoken": "^9.0.6",
+        "@types/node": "^20.12.7",
+        "nodemon": "^3.1.0",
+        "prettier": "^3.2.5",
+        "typescript": "^5.4.5"
+    },
+    "dependencies": {
+        "@prisma/client": "5.13.0",
+        "@types/cors": "^2.8.17",
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "glob": "^10.3.12",
+        "jsonwebtoken": "^9.0.2",
+        "prisma": "^5.14.0",
+        "ts-node": "^10.9.2"
+    }
+}

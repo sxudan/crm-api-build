@@ -1,0 +1,227 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+model Country {
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
+  universities    University[]
+  leads           Lead[]
+  createdAt       DateTime      @default(now()) // Add createdAt field
+  updatedAt       DateTime      @updatedAt // Add updatedAt field
+  applications    Application[]
+  visaStatusLists VisaStatus[]
+}
+
+model University {
+  id           Int           @id @default(autoincrement())
+  name         String
+  country      Country       @relation(fields: [countryId], references: [id])
+  countryId    Int
+  courses      Course[]
+  applications Application[]
+  createdAt    DateTime      @default(now()) // Add createdAt field
+  updatedAt    DateTime      @updatedAt // Add updatedAt field
+}
+
+model Course {
+  id           Int                      @id @default(autoincrement())
+  name         String
+  universityId Int
+  university   University               @relation(fields: [universityId], references: [id])
+  applications Application[]
+  intakes      CourseUniversityIntake[]
+  createdAt    DateTime                 @default(now()) // Add createdAt field
+  updatedAt    DateTime                 @updatedAt // Add updatedAt field
+}
+
+model VisaStatus {
+  id        Int     @id @default(autoincrement())
+  name      String
+  order     Int
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+  applications  Application[]
+}
+
+// model CourseUniversity {
+//   id           Int                      @id @default(autoincrement())
+//   university   University               @relation(fields: [universityId], references: [id])
+//   universityId Int
+//   course       Course                   @relation(fields: [courseId], references: [id])
+//   courseId     Int
+//   intakes      CourseUniversityIntake[]
+//   createdAt    DateTime                 @default(now()) // Add createdAt field
+//   updatedAt    DateTime                 @updatedAt // Add updatedAt field
+
+//   @@unique([universityId, courseId])
+// }
+
+model Intake {
+  id                 Int                      @id @default(autoincrement())
+  title              String
+  startDate          DateTime
+  endDate            DateTime
+  courseUniversities CourseUniversityIntake[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+}
+
+model CourseUniversityIntake {
+  id        Int      @id @default(autoincrement())
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  Int
+  intake    Intake   @relation(fields: [intakeId], references: [id])
+  intakeId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([courseId, intakeId])
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String    @unique
+  phone     String
+  dob       DateTime?
+  password  String
+  admin     Admin?
+  createdAt DateTime  @default(now()) // Add createdAt field
+  updatedAt DateTime  @updatedAt // Add updatedAt field
+}
+
+model Branch {
+  id        Int      @id @default(autoincrement())
+  name      String
+  addressId Int      @unique
+  address   Address  @relation(fields: [addressId], references: [id])
+  admins    Admin[]
+  createdAt DateTime @default(now()) // Add createdAt field
+  updatedAt DateTime @updatedAt // Add updatedAt field
+}
+
+model Address {
+  id         Int     @id @default(autoincrement())
+  street1    String
+  street2    String?
+  city       String
+  state      String
+  postalcode String
+  branch     Branch?
+}
+
+model Role {
+  id     Int     @id @default(autoincrement())
+  name   String
+  admins Admin[]
+}
+
+model Admin {
+  userId    Int      @id
+  user      User     @relation(fields: [userId], references: [id])
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    Int
+  branchId  Int
+  branch    Branch   @relation(fields: [branchId], references: [id])
+  tasks     Task[]
+  createdAt DateTime @default(now()) // Add createdAt field
+  updatedAt DateTime @updatedAt // Add updatedAt field
+}
+
+model Lead {
+  id           Int           @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String
+  phone        String
+  country      Country       @relation(fields: [countryId], references: [id])
+  countryId    Int
+  description  String
+  createdAt    DateTime      @default(now()) // Add createdAt field
+  updatedAt    DateTime      @updatedAt // Add updatedAt field
+  languageLead LanguageLead?
+  converted    Boolean       @default(false)
+  Application  Application[]
+}
+
+model LanguageType {
+  id            Int            @id @default(autoincrement())
+  name          String
+  languageLeads LanguageLead[]
+}
+
+model LanguageAdmissionType {
+  id            Int            @id @default(autoincrement())
+  name          String
+  languageLeads LanguageLead[]
+}
+
+model LanguageLead {
+  id               Int                   @id @default(autoincrement())
+  lead             Lead                  @relation(fields: [leadId], references: [id])
+  leadId           Int                   @unique
+  languageType     LanguageType          @relation(fields: [languageTypeId], references: [id])
+  languageTypeId   Int
+  admissionType    LanguageAdmissionType @relation(fields: [addmissionTypeId], references: [id])
+  addmissionTypeId Int
+}
+
+model Task {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  assignedToId Int
+  assignedTo   Admin     @relation(fields: [assignedToId], references: [userId])
+  dueDate      DateTime?
+  createdAt    DateTime  @default(now()) // Add createdAt field
+  updatedAt    DateTime  @updatedAt // Add updatedAt field
+}
+
+enum ApplicationStatus {
+  Taking_Class
+  Offer_Applied
+  Offer_Received
+  Visa_Applied
+}
+
+model Application {
+  id           Int               @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String
+  phone        String
+  country      Country           @relation(fields: [countryId], references: [id])
+  countryId    Int
+  description  String
+  createdAt    DateTime          @default(now()) // Add createdAt field
+  updatedAt    DateTime          @updatedAt // Add updatedAt field
+  intake       DateTime
+  courseId     Int
+  course       Course            @relation(fields: [courseId], references: [id])
+  universityId Int
+  university   University        @relation(fields: [universityId], references: [id])
+  leadId       Int?
+  lead         Lead?             @relation(fields: [leadId], references: [id])
+  visaStatusId  Int
+  visaStatus       VisaStatus @relation(fields: [visaStatusId], references: [id])
+}

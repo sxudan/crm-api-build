@@ -1,0 +1,9 @@
+node_modules
+credential.json
+.env*
+dist
+*.zip
+.vercel
+public
+tmp
+stderr.log
