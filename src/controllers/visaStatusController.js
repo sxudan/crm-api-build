@@ -23,14 +23,15 @@ const addVisaStatus = (status) => __awaiter(void 0, void 0, void 0, function* ()
 exports.addVisaStatus = addVisaStatus;
 const updateVisaStatus = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        yield tx.visaStatus.deleteMany({
-            where: {
-                countryId: parseInt(input.countryId)
-            }
-        });
-        yield tx.visaStatus.createMany({
-            data: input.statuses
-        });
+        const updatePromises = input.statuses.map((status) => tx.visaStatus.update({
+            where: { id: status.id },
+            data: {
+                name: status.name,
+                order: status.order,
+                countryId: status.countryId,
+            },
+        }));
+        yield Promise.all(updatePromises);
     }));
 });
 exports.updateVisaStatus = updateVisaStatus;
