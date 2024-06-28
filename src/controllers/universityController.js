@@ -11,17 +11,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUniversitiesByCountry = exports.updateUniversity = exports.getUniversity = exports.getUniversities = exports.deleteUniversity = exports.addUniversity = void 0;
 const prisma_1 = require("../prisma");
-const addUniversity = (universityName, countryId) => __awaiter(void 0, void 0, void 0, function* () {
+const addUniversity = (universityName, countryId, address) => __awaiter(void 0, void 0, void 0, function* () {
     const university = yield prisma_1.prisma.university.create({
         data: {
             name: universityName,
             countryId: countryId,
+            address: address
         },
     });
     return university;
 });
 exports.addUniversity = addUniversity;
-const updateUniversity = (id, universityName, countryId) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUniversity = (id, universityName, countryId, address) => __awaiter(void 0, void 0, void 0, function* () {
     const university = yield prisma_1.prisma.university.update({
         where: {
             id: id,
@@ -29,6 +30,7 @@ const updateUniversity = (id, universityName, countryId) => __awaiter(void 0, vo
         data: {
             name: universityName,
             countryId: countryId,
+            address: address
         },
     });
     return university;

@@ -22,9 +22,13 @@ const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
             description: input.description,
             leadId: input.leadId,
             visaStatusId: input.statusId,
-            intake: new Date(input.intakeYearMonth),
+            intakeId: input.intakeId,
             courseId: input.courseId,
-            universityId: input.universityId
+            universityId: input.universityId,
+            archived: false,
+            passportCountry: input.passportCountry,
+            referer: input.referer,
+            dob: new Date(input.dob)
         },
     });
 });
@@ -48,9 +52,10 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
             countryId: input.countryId,
             description: input.description,
             visaStatusId: input.statusId,
-            intake: input.intakeYearMonth ? new Date(input.intakeYearMonth) : undefined,
+            intakeId: input.intakeId,
             courseId: input.courseId,
-            universityId: input.universityId
+            universityId: input.universityId,
+            dob: input.dob ? new Date(input.dob) : undefined
         },
     });
 });

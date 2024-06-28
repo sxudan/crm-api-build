@@ -15,8 +15,8 @@ const universityController_1 = require("../controllers/universityController");
 exports.universityRoutes = (0, express_1.Router)();
 exports.universityRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, countryId } = req.body;
-        yield (0, universityController_1.addUniversity)(name, parseInt(countryId));
+        const { name, countryId, address } = req.body;
+        yield (0, universityController_1.addUniversity)(name, parseInt(countryId), address);
         res.status(200).send({ success: true });
     }
     catch (e) {
