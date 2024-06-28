@@ -51,6 +51,7 @@ const getUniversity = (id) => __awaiter(void 0, void 0, void 0, function* () {
                 },
             },
             courses: true,
+            address: true,
         },
     });
     if (raw) {
@@ -66,6 +67,7 @@ const getUniversities = () => __awaiter(void 0, void 0, void 0, function* () {
             name: true,
             createdAt: true,
             updatedAt: true,
+            address: true,
             country: {
                 select: {
                     name: true,
@@ -87,6 +89,7 @@ const getUniversitiesByCountry = (countryId) => __awaiter(void 0, void 0, void 0
             name: true,
             createdAt: true,
             updatedAt: true,
+            address: true,
             country: {
                 select: {
                     name: true,
