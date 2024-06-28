@@ -54,12 +54,12 @@ model Course {
 }
 
 model VisaStatus {
-  id        Int     @id @default(autoincrement())
-  name      String
-  order     Int
-  countryId Int
-  country   Country @relation(fields: [countryId], references: [id])
-  applications  Application[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  order        Int
+  countryId    Int
+  country      Country       @relation(fields: [countryId], references: [id])
+  applications Application[]
 }
 
 // model CourseUniversity {
@@ -161,7 +161,8 @@ model Lead {
   updatedAt    DateTime      @updatedAt // Add updatedAt field
   languageLead LanguageLead?
   converted    Boolean       @default(false)
-  Application  Application[]
+  application  Application[]
+  priority     Priority
 }
 
 model LanguageType {
@@ -197,31 +198,30 @@ model Task {
   updatedAt    DateTime  @updatedAt // Add updatedAt field
 }
 
-enum ApplicationStatus {
-  Taking_Class
-  Offer_Applied
-  Offer_Received
-  Visa_Applied
+enum Priority {
+  High
+  Medium
+  Low
 }
 
 model Application {
-  id           Int               @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   firstname    String
   lastname     String
   email        String
   phone        String
-  country      Country           @relation(fields: [countryId], references: [id])
+  country      Country    @relation(fields: [countryId], references: [id])
   countryId    Int
   description  String
-  createdAt    DateTime          @default(now()) // Add createdAt field
-  updatedAt    DateTime          @updatedAt // Add updatedAt field
+  createdAt    DateTime   @default(now()) // Add createdAt field
+  updatedAt    DateTime   @updatedAt // Add updatedAt field
   intake       DateTime
   courseId     Int
-  course       Course            @relation(fields: [courseId], references: [id])
+  course       Course     @relation(fields: [courseId], references: [id])
   universityId Int
-  university   University        @relation(fields: [universityId], references: [id])
+  university   University @relation(fields: [universityId], references: [id])
   leadId       Int?
-  lead         Lead?             @relation(fields: [leadId], references: [id])
-  visaStatusId  Int
-  visaStatus       VisaStatus @relation(fields: [visaStatusId], references: [id])
+  lead         Lead?      @relation(fields: [leadId], references: [id])
+  visaStatusId Int
+  visaStatus   VisaStatus @relation(fields: [visaStatusId], references: [id])
 }

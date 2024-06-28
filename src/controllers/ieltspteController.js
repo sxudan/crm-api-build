@@ -21,6 +21,7 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
                 phone: input.phone,
                 countryId: input.countryId,
                 description: input.description,
+                priority: input.priority
             },
         });
         yield tx.languageLead.create({
@@ -52,6 +53,7 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                 phone: input.phone,
                 countryId: input.countryId,
                 description: input.description,
+                priority: input.priority
             },
         });
         // Update the associated language lead details

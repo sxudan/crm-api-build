@@ -20,6 +20,7 @@ const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             phone: input.phone,
             countryId: input.countryId,
             description: input.description,
+            priority: input.priority
         },
     });
 });
@@ -42,6 +43,7 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             phone: input.phone,
             countryId: input.countryId,
             description: input.description,
+            priority: input.priority
         },
     });
 });
