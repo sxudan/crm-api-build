@@ -55,7 +55,9 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
             intakeId: input.intakeId,
             courseId: input.courseId,
             universityId: input.universityId,
-            dob: input.dob ? new Date(input.dob) : undefined
+            dob: input.dob ? new Date(input.dob) : undefined,
+            passportCountry: input.passportCountry,
+            referer: input.referer
         },
     });
 });
@@ -67,7 +69,8 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 country: true,
                 course: true,
                 university: true,
-                visaStatus: true
+                visaStatus: true,
+                intake: true,
             },
         });
         return leads;
