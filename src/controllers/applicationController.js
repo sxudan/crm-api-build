@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
+exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
 const prisma_1 = require("../prisma");
 const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.application.create({
@@ -33,6 +33,41 @@ const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.addApplicant = addApplicant;
+const searchApplicants = (query, applicationStatusId) => __awaiter(void 0, void 0, void 0, function* () {
+    const applicants = yield prisma_1.prisma.application.findMany({
+        where: {
+            OR: [
+                { firstname: { contains: query, mode: 'insensitive' } },
+                { lastname: { contains: query, mode: 'insensitive' } },
+                { email: { contains: query, mode: 'insensitive' } },
+                { phone: { contains: query, mode: 'insensitive' } },
+            ],
+            AND: [
+                { visaStatusId: applicationStatusId }
+            ]
+        },
+        include: {
+            country: true,
+            course: true,
+            university: true,
+            visaStatus: true,
+            intake: true,
+        },
+    });
+    return applicants;
+});
+exports.searchApplicants = searchApplicants;
+const updateApplicantStatus = (applicantId, statusId) => __awaiter(void 0, void 0, void 0, function* () {
+    yield prisma_1.prisma.application.update({
+        where: {
+            id: applicantId
+        },
+        data: {
+            visaStatusId: statusId
+        }
+    });
+});
+exports.updateApplicantStatus = updateApplicantStatus;
 const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
     // Fetch the existing lead to ensure it exists
     const existingLead = yield prisma_1.prisma.application.findUnique({
@@ -72,6 +107,9 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 visaStatus: true,
                 intake: true,
             },
+            orderBy: {
+                updatedAt: 'desc',
+            }
         });
         return leads;
     }));

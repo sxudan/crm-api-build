@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteVisaStatus = exports.updateVisaStatus = exports.getVisaStatusForCountry = exports.addVisaStatus = void 0;
+exports.getVisaStatuses = exports.deleteVisaStatus = exports.updateVisaStatus = exports.getVisaStatusForCountry = exports.addVisaStatus = void 0;
 const prisma_1 = require("../prisma");
 const addVisaStatus = (status) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.visaStatus.create({
@@ -43,6 +43,14 @@ const getVisaStatusForCountry = (countryId) => __awaiter(void 0, void 0, void 0,
     });
 });
 exports.getVisaStatusForCountry = getVisaStatusForCountry;
+const getVisaStatuses = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.prisma.visaStatus.findMany({
+        include: {
+            country: true
+        }
+    });
+});
+exports.getVisaStatuses = getVisaStatuses;
 const deleteVisaStatus = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.visaStatus.delete({
         where: {

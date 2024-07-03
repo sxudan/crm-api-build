@@ -57,6 +57,9 @@ const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
             include: {
                 country: true,
             },
+            orderBy: {
+                createdAt: 'desc',
+            }
         });
         return leads;
     }));

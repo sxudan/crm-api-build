@@ -33,9 +33,29 @@ exports.applicationRoutes.put("/", (req, res, next) => __awaiter(void 0, void 0,
         next(e);
     }
 }));
+exports.applicationRoutes.put("/status", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { applicantId, statusId } = req.body;
+        const result = yield (0, applicationController_1.updateApplicantStatus)(applicantId, statusId);
+        res.status(200).send({ success: true });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
 exports.applicationRoutes.get("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, applicationController_1.getApplicants)();
+        res.status(200).send({ success: true, data: result });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
+exports.applicationRoutes.get("/search", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { searchText, visaStatusId } = req.query;
+        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusId ? parseInt(visaStatusId) : undefined);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {

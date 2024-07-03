@@ -46,7 +46,8 @@ exports.visaStatusRoutes.get("/", auth_1.default, access_1.default, (req, res, n
             res.status(200).send({ success: true, data: result });
         }
         else {
-            next(Error('No country Id provided'));
+            const result = yield (0, visaStatusController_1.getVisaStatuses)();
+            res.status(200).send({ success: true, data: result });
         }
     }
     catch (e) {

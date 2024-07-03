@@ -85,6 +85,9 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
                     },
                 },
             },
+            orderBy: {
+                createdAt: 'desc',
+            }
         });
         return leads.map((x) => {
             var _a, _b, _c;
