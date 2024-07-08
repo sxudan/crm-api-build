@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
   // binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
@@ -37,6 +37,7 @@ model University {
   country      Country       @relation(fields: [countryId], references: [id])
   addresses    String[]
   countryId    Int
+  direct  Boolean
   courses      Course[]
   applications Application[]
   createdAt    DateTime      @default(now()) // Add createdAt field
@@ -79,8 +80,8 @@ model VisaStatus {
 model Intake {
   id                 Int                      @id @default(autoincrement())
   title              String
-  startDate          DateTime
-  endDate            DateTime
+  startDate          Int
+  endDate            Int
   courseUniversities CourseUniversityIntake[]
   createdAt          DateTime                 @default(now())
   updatedAt          DateTime                 @updatedAt
@@ -207,28 +208,41 @@ enum Priority {
 }
 
 model Application {
-  id              Int        @id @default(autoincrement())
-  firstname       String
-  lastname        String
-  email           String
-  phone           String
-  dob             DateTime
-  passportCountry String
-  country         Country    @relation(fields: [countryId], references: [id])
-  countryId       Int
-  description     String
-  createdAt       DateTime   @default(now()) // Add createdAt field
-  updatedAt       DateTime   @updatedAt // Add updatedAt field
-  intakeId        Int
-  intake          Intake     @relation(fields: [intakeId], references: [id])
-  courseId        Int
-  course          Course     @relation(fields: [courseId], references: [id])
-  universityId    Int
-  university      University @relation(fields: [universityId], references: [id])
-  leadId          Int?
-  lead            Lead?      @relation(fields: [leadId], references: [id])
-  visaStatusId    Int
-  visaStatus      VisaStatus @relation(fields: [visaStatusId], references: [id])
-  archived        Boolean
-  referer         String?
+  id                Int        @id @default(autoincrement())
+  firstname         String
+  lastname          String
+  email             String
+  phone             String
+  dob               DateTime
+  passportCountry   String
+  country           Country    @relation(fields: [countryId], references: [id])
+  countryId         Int
+  description       String
+  createdAt         DateTime   @default(now()) // Add createdAt field
+  updatedAt         DateTime   @updatedAt // Add updatedAt field
+  intakeId          Int
+  intake            Intake     @relation(fields: [intakeId], references: [id])
+  courseId          Int
+  course            Course     @relation(fields: [courseId], references: [id])
+  universityId      Int
+  university        University @relation(fields: [universityId], references: [id])
+  universityAddress String?
+  leadId            Int?
+  lead              Lead?      @relation(fields: [leadId], references: [id])
+  visaStatusId      Int
+  visaStatus        VisaStatus @relation(fields: [visaStatusId], references: [id])
+  archived          Boolean
+  isDirect          Boolean
+  referer           String?
+  subAgentId        Int?
+  subAgent          SubAgent?  @relation(fields: [subAgentId], references: [id])
+}
+
+model SubAgent {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String
+  phone        String?
+  address      String?
+  applications Application[]
 }

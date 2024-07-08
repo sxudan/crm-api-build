@@ -21,8 +21,8 @@ const addIntake = (intakeInput, courseId, universityId) => __awaiter(void 0, voi
         // })
         const intake = yield tx.intake.create({
             data: {
-                startDate: new Date(intakeInput.startDate),
-                endDate: new Date(intakeInput.endDate),
+                startDate: intakeInput.startDate,
+                endDate: intakeInput.endDate,
                 title: intakeInput.title
             }
         });
@@ -38,8 +38,8 @@ exports.addIntake = addIntake;
 const createIntake = (intakeInput) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.intake.create({
         data: {
-            startDate: new Date(intakeInput.startDate),
-            endDate: new Date(intakeInput.endDate),
+            startDate: intakeInput.startDate,
+            endDate: intakeInput.endDate,
             title: intakeInput.title
         }
     });
@@ -51,8 +51,8 @@ const updateIntake = (intakeInput) => __awaiter(void 0, void 0, void 0, function
             id: intakeInput.id
         },
         data: {
-            startDate: new Date(intakeInput.startDate),
-            endDate: new Date(intakeInput.endDate),
+            startDate: intakeInput.startDate,
+            endDate: intakeInput.endDate,
             title: intakeInput.title
         }
     });

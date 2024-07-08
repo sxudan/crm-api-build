@@ -13,4 +13,5 @@ var Features;
     Features["Users"] = "Users";
     Features["Tasks"] = "Tasks";
     Features["VisaStatus"] = "VisaStatus";
+    Features["SubAgent"] = "SubAgent";
 })(Features || (exports.Features = Features = {}));

@@ -11,18 +11,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUniversitiesByCountry = exports.updateUniversity = exports.getUniversity = exports.getUniversities = exports.deleteUniversity = exports.addUniversity = void 0;
 const prisma_1 = require("../prisma");
-const addUniversity = (universityName, countryId, addresses) => __awaiter(void 0, void 0, void 0, function* () {
+const addUniversity = (universityName, countryId, addresses, isDirect) => __awaiter(void 0, void 0, void 0, function* () {
     const university = yield prisma_1.prisma.university.create({
         data: {
             name: universityName,
             countryId: countryId,
-            addresses: addresses
+            addresses: addresses,
+            direct: isDirect
         },
     });
     return university;
 });
 exports.addUniversity = addUniversity;
-const updateUniversity = (id, universityName, countryId, addresses) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUniversity = (id, universityName, countryId, addresses, isDirect) => __awaiter(void 0, void 0, void 0, function* () {
     const university = yield prisma_1.prisma.university.update({
         where: {
             id: id,
@@ -30,7 +31,8 @@ const updateUniversity = (id, universityName, countryId, addresses) => __awaiter
         data: {
             name: universityName,
             countryId: countryId,
-            addresses: addresses
+            addresses: addresses,
+            direct: isDirect
         },
     });
     return university;
@@ -50,6 +52,7 @@ const getUniversity = (id) => __awaiter(void 0, void 0, void 0, function* () {
                     name: true,
                 },
             },
+            direct: true,
             courses: true,
             addresses: true,
         },
@@ -68,6 +71,7 @@ const getUniversities = () => __awaiter(void 0, void 0, void 0, function* () {
             createdAt: true,
             updatedAt: true,
             addresses: true,
+            direct: true,
             country: {
                 select: {
                     name: true,
@@ -90,6 +94,7 @@ const getUniversitiesByCountry = (countryId) => __awaiter(void 0, void 0, void 0
             createdAt: true,
             updatedAt: true,
             addresses: true,
+            direct: true,
             country: {
                 select: {
                     name: true,

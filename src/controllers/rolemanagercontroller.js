@@ -100,6 +100,12 @@ const fetchAccessConfiguration = () => {
             [types_1.Roles.Counsellor]: readAccessOnly,
             [types_1.Roles.Frontdesk]: readAccessOnly,
             [types_1.Roles.Account]: readAccessOnly,
+        },
+        [featurelists_1.Features.SubAgent]: {
+            [types_1.Roles.Superadmin]: allAccess,
+            [types_1.Roles.Counsellor]: readAccessOnly,
+            [types_1.Roles.Frontdesk]: readAccessOnly,
+            [types_1.Roles.Account]: readAccessOnly,
         }
     };
 };

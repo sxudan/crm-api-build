@@ -28,12 +28,15 @@ const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
             archived: false,
             passportCountry: input.passportCountry,
             referer: input.referer,
-            dob: new Date(input.dob)
+            dob: new Date(input.dob),
+            isDirect: input.isDirect,
+            subAgentId: input.subagentId,
+            universityAddress: input.universityAddress
         },
     });
 });
 exports.addApplicant = addApplicant;
-const searchApplicants = (query, applicationStatusId) => __awaiter(void 0, void 0, void 0, function* () {
+const searchApplicants = (query, applicationStatusIds, isDirect, startDate) => __awaiter(void 0, void 0, void 0, function* () {
     const applicants = yield prisma_1.prisma.application.findMany({
         where: {
             OR: [
@@ -43,7 +46,9 @@ const searchApplicants = (query, applicationStatusId) => __awaiter(void 0, void 
                 { phone: { contains: query, mode: 'insensitive' } },
             ],
             AND: [
-                { visaStatusId: applicationStatusId }
+                { visaStatusId: applicationStatusIds.length === 0 ? undefined : { in: applicationStatusIds } },
+                { isDirect: { equals: isDirect } },
+                { intake: { startDate: { equals: startDate } } }
             ]
         },
         include: {
@@ -52,6 +57,7 @@ const searchApplicants = (query, applicationStatusId) => __awaiter(void 0, void 
             university: true,
             visaStatus: true,
             intake: true,
+            subAgent: true
         },
     });
     return applicants;
@@ -92,7 +98,10 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
             universityId: input.universityId,
             dob: input.dob ? new Date(input.dob) : undefined,
             passportCountry: input.passportCountry,
-            referer: input.referer
+            referer: input.referer,
+            isDirect: input.isDirect,
+            subAgentId: input.subagentId,
+            universityAddress: input.universityAddress
         },
     });
 });
@@ -106,6 +115,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 university: true,
                 visaStatus: true,
                 intake: true,
+                subAgent: true
             },
             orderBy: {
                 updatedAt: 'desc',

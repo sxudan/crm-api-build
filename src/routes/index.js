@@ -16,6 +16,7 @@ const featurelists_1 = require("../utils/featurelists");
 const application_1 = require("./application");
 const intake_1 = require("./intake");
 const visaStatus_1 = require("./visaStatus");
+const subAgent_1 = require("./subAgent");
 const featureMap = {
     "/country": featurelists_1.Features.Countries,
     "/university": featurelists_1.Features.Universities,
@@ -25,10 +26,11 @@ const featureMap = {
     "/user": featurelists_1.Features.Users,
     "/task": featurelists_1.Features.Tasks,
     "/application": featurelists_1.Features.Applicants,
-    '/visastatus': featurelists_1.Features.VisaStatus
+    "/visastatus": featurelists_1.Features.VisaStatus,
+    "/subagent": featurelists_1.Features.SubAgent,
 };
 const featureName = (req, res, next) => {
-    const url = req.baseUrl.replace('/api', '');
+    const url = req.baseUrl.replace("/api", "");
     req.featureName = featureMap[url];
     next();
 };
@@ -47,4 +49,5 @@ exports.router.use("/task", featureName, task_1.taskRoutes);
 exports.router.use("/configuration", configuration_1.configRoutes);
 exports.router.use("/application", featureName, application_1.applicationRoutes);
 exports.router.use("/intake", featureName, intake_1.intakeRoutes);
-exports.router.use('/visastatus', featureName, visaStatus_1.visaStatusRoutes);
+exports.router.use("/visastatus", featureName, visaStatus_1.visaStatusRoutes);
+exports.router.use("/subagent", featureName, subAgent_1.subAgentRouter);

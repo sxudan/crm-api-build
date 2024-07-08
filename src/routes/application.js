@@ -52,10 +52,10 @@ exports.applicationRoutes.get("/", (req, res, next) => __awaiter(void 0, void 0,
         next(e);
     }
 }));
-exports.applicationRoutes.get("/search", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.applicationRoutes.post("/search", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { searchText, visaStatusId } = req.query;
-        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusId ? parseInt(visaStatusId) : undefined);
+        const { searchText, visaStatusIds, isDirect, startDate, } = req.body;
+        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusIds, isDirect, startDate);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {
