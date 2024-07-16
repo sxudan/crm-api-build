@@ -54,8 +54,8 @@ exports.applicationRoutes.get("/", (req, res, next) => __awaiter(void 0, void 0,
 }));
 exports.applicationRoutes.post("/search", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { searchText, visaStatusIds, isDirect, startDate, } = req.body;
-        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusIds, isDirect, startDate);
+        const { searchText, visaStatusIds, isDirect, intake, year, country, institution, course, } = req.body;
+        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusIds, isDirect, intake, year, country ? parseInt(country) : undefined, institution ? parseInt(institution) : undefined, course ? parseInt(course) : undefined);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {

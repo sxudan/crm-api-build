@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
+exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
 const prisma_1 = require("../prisma");
 const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.lead.create({
@@ -20,7 +20,10 @@ const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             phone: input.phone,
             countryId: input.countryId,
             description: input.description,
-            priority: input.priority
+            priority: input.priority,
+            converted: false,
+            archived: false,
+            toConvert: false,
         },
     });
 });
@@ -43,7 +46,9 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             phone: input.phone,
             countryId: input.countryId,
             description: input.description,
-            priority: input.priority
+            priority: input.priority,
+            archived: input.convert,
+            toConvert: input.convert
         },
     });
 });
@@ -53,6 +58,7 @@ const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
         const leads = yield tx.lead.findMany({
             where: {
                 languageLead: null,
+                archived: false
             },
             include: {
                 country: true,
@@ -66,6 +72,26 @@ const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
     return leads;
 });
 exports.getLeads = getLeads;
+const getArchivedLeads = () => __awaiter(void 0, void 0, void 0, function* () {
+    const leads = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const leads = yield tx.lead.findMany({
+            where: {
+                archived: true,
+                converted: false,
+                toConvert: true,
+            },
+            include: {
+                country: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            }
+        });
+        return leads;
+    }));
+    return leads;
+});
+exports.getArchivedLeads = getArchivedLeads;
 const deleteLead = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         yield tx.lead.deleteMany({

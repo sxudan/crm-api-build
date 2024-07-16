@@ -14,7 +14,7 @@ const task_1 = require("./task");
 const configuration_1 = require("./configuration");
 const featurelists_1 = require("../utils/featurelists");
 const application_1 = require("./application");
-const intake_1 = require("./intake");
+// import { intakeRoutes } from "./intake";
 const visaStatus_1 = require("./visaStatus");
 const subAgent_1 = require("./subAgent");
 const featureMap = {
@@ -48,6 +48,6 @@ exports.router.use("/user", featureName, users_1.userRoutes);
 exports.router.use("/task", featureName, task_1.taskRoutes);
 exports.router.use("/configuration", configuration_1.configRoutes);
 exports.router.use("/application", featureName, application_1.applicationRoutes);
-exports.router.use("/intake", featureName, intake_1.intakeRoutes);
+// router.use("/intake", featureName, intakeRoutes);
 exports.router.use("/visastatus", featureName, visaStatus_1.visaStatusRoutes);
 exports.router.use("/subagent", featureName, subAgent_1.subAgentRouter);

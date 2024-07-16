@@ -15,8 +15,8 @@ const courseController_1 = require("../controllers/courseController");
 exports.courseRoutes = (0, express_1.Router)();
 exports.courseRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, universityId, intakeIds } = req.body;
-        const result = yield (0, courseController_1.addCourse)(name, universityId, intakeIds !== null && intakeIds !== void 0 ? intakeIds : []);
+        const { name, universityId, intakes } = req.body;
+        const result = yield (0, courseController_1.addCourse)(name, universityId, intakes !== null && intakes !== void 0 ? intakes : []);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {
@@ -25,8 +25,8 @@ exports.courseRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, voi
 }));
 exports.courseRoutes.put("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, name, universityId, intakeIds } = req.body;
-        const result = yield (0, courseController_1.updateCourse)(id, name, universityId, intakeIds);
+        const { id, name, universityId, intakes } = req.body;
+        const result = yield (0, courseController_1.updateCourse)(id, name, universityId, intakes);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {

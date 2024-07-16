@@ -11,27 +11,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCoursesByUniversity = exports.updateCourse = exports.getCourses = exports.deleteCourse = exports.addCourse = void 0;
 const prisma_1 = require("../prisma");
-const addCourse = (courseName, universityId, intakeIds) => __awaiter(void 0, void 0, void 0, function* () {
+const addCourse = (courseName, universityId, intakes) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const course = yield tx.course.create({
             data: {
                 name: courseName,
-                universityId: universityId
+                universityId: universityId,
+                intakes: intakes
             },
         });
-        for (let intakeId of intakeIds) {
-            yield tx.courseUniversityIntake.create({
-                data: {
-                    intakeId: intakeId,
-                    courseId: course.id
-                }
-            });
-        }
+        // for(let intakeId of intakeIds) {
+        //   await tx.courseUniversityIntake.create({
+        //     data: {
+        //       intakeId: intakeId,
+        //       courseId: course.id
+        //     }
+        //   })
+        // }
     }));
     return null;
 });
 exports.addCourse = addCourse;
-const updateCourse = (courseId, courseName, universityId, intakeIds) => __awaiter(void 0, void 0, void 0, function* () {
+const updateCourse = (courseId, courseName, universityId, intakes) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         // Fetch the existing course to ensure it exists
         const existingCourse = yield tx.course.findUnique({
@@ -44,25 +45,25 @@ const updateCourse = (courseId, courseName, universityId, intakeIds) => __awaite
         if (courseName) {
             yield tx.course.update({
                 where: { id: courseId },
-                data: { name: courseName, universityId: universityId },
+                data: { name: courseName, universityId: universityId, intakes: intakes },
             });
         }
         // Update the associated universities if they're provided
-        if (universityId) {
-            // Remove existing associations
-            yield tx.courseUniversityIntake.deleteMany({
-                where: { courseId: courseId },
-            });
-            // Add new associations
-            for (const id of intakeIds !== null && intakeIds !== void 0 ? intakeIds : []) {
-                yield tx.courseUniversityIntake.create({
-                    data: {
-                        courseId: courseId,
-                        intakeId: id,
-                    },
-                });
-            }
-        }
+        // if (universityId) {
+        //   // Remove existing associations
+        //   await tx.courseUniversityIntake.deleteMany({
+        //     where: { courseId: courseId },
+        //   });
+        //   // Add new associations
+        //   for (const id of intakeIds ?? []) {
+        //     await tx.courseUniversityIntake.create({
+        //       data: {
+        //         courseId: courseId,
+        //         intakeId: id,
+        //       },
+        //     });
+        //   }
+        // }
     }));
     return null;
 });
@@ -94,14 +95,10 @@ const getCourses = () => __awaiter(void 0, void 0, void 0, function* () {
             id: true,
             name: true,
             university: true,
-            intakes: {
-                include: {
-                    intake: true
-                }
-            }
+            intakes: true
         },
     });
-    const flattenedCourses = courses.map((course) => (Object.assign(Object.assign({}, course), { intakes: course.intakes.map(({ intake }) => intake) })));
+    const flattenedCourses = courses.map((course) => (Object.assign({}, course)));
     return flattenedCourses;
 });
 exports.getCourses = getCourses;
@@ -114,24 +111,20 @@ const getCoursesByUniversity = (universityId) => __awaiter(void 0, void 0, void 
             id: true,
             name: true,
             university: true,
-            intakes: {
-                include: {
-                    intake: true
-                }
-            }
+            intakes: true
         },
     });
-    const flattenedCourses = courses.map((course) => (Object.assign(Object.assign({}, course), { intakes: course.intakes.map(({ intake }) => intake) })));
+    const flattenedCourses = courses.map((course) => (Object.assign({}, course)));
     return flattenedCourses;
 });
 exports.getCoursesByUniversity = getCoursesByUniversity;
 const deleteCourse = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        yield tx.courseUniversityIntake.deleteMany({
-            where: {
-                courseId: id,
-            },
-        });
+        // await tx.courseUniversityIntake.deleteMany({
+        //   where: {
+        //     courseId: id,
+        //   },
+        // });
         yield tx.course.delete({
             where: {
                 id: id,

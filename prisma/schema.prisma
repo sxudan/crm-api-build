@@ -37,7 +37,7 @@ model University {
   country      Country       @relation(fields: [countryId], references: [id])
   addresses    String[]
   countryId    Int
-  direct  Boolean
+  direct       Boolean
   courses      Course[]
   applications Application[]
   createdAt    DateTime      @default(now()) // Add createdAt field
@@ -45,14 +45,14 @@ model University {
 }
 
 model Course {
-  id           Int                      @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
   universityId Int
-  university   University               @relation(fields: [universityId], references: [id])
+  university   University    @relation(fields: [universityId], references: [id])
   applications Application[]
-  intakes      CourseUniversityIntake[]
-  createdAt    DateTime                 @default(now()) // Add createdAt field
-  updatedAt    DateTime                 @updatedAt // Add updatedAt field
+  intakes      Int[]
+  createdAt    DateTime      @default(now()) // Add createdAt field
+  updatedAt    DateTime      @updatedAt // Add updatedAt field
 }
 
 model VisaStatus {
@@ -77,28 +77,17 @@ model VisaStatus {
 //   @@unique([universityId, courseId])
 // }
 
-model Intake {
-  id                 Int                      @id @default(autoincrement())
-  title              String
-  startDate          Int
-  endDate            Int
-  courseUniversities CourseUniversityIntake[]
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
-  applications       Application[]
-}
+// model CourseUniversityIntake {
+//   id        Int      @id @default(autoincrement())
+//   // course    Course   @relation(fields: [courseId], references: [id])
+//   courseId  Int
+//   intake    Intake   @relation(fields: [intakeId], references: [id])
+//   intakeId  Int
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-model CourseUniversityIntake {
-  id        Int      @id @default(autoincrement())
-  course    Course   @relation(fields: [courseId], references: [id])
-  courseId  Int
-  intake    Intake   @relation(fields: [intakeId], references: [id])
-  intakeId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([courseId, intakeId])
-}
+//   @@unique([courseId, intakeId])
+// }
 
 model User {
   id        Int       @id @default(autoincrement())
@@ -166,6 +155,8 @@ model Lead {
   converted    Boolean       @default(false)
   application  Application[]
   priority     Priority
+  archived     Boolean       @default(false)
+  toConvert    Boolean       @default(false)
 }
 
 model LanguageType {
@@ -220,8 +211,9 @@ model Application {
   description       String
   createdAt         DateTime   @default(now()) // Add createdAt field
   updatedAt         DateTime   @updatedAt // Add updatedAt field
-  intakeId          Int
-  intake            Intake     @relation(fields: [intakeId], references: [id])
+  // intake            Intake     @relation(fields: [intakeId], references: [id])
+  intake            Int
+  year              Int
   courseId          Int
   course            Course     @relation(fields: [courseId], references: [id])
   universityId      Int
@@ -236,6 +228,8 @@ model Application {
   referer           String?
   subAgentId        Int?
   subAgent          SubAgent?  @relation(fields: [subAgentId], references: [id])
+  converted         Boolean    @default(false)
+  // Intake            Intake     @relation(fields: [intakeId], references: [id])
 }
 
 model SubAgent {

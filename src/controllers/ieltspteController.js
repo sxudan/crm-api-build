@@ -53,7 +53,9 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                 phone: input.phone,
                 countryId: input.countryId,
                 description: input.description,
-                priority: input.priority
+                priority: input.priority,
+                archived: input.convert,
+                toConvert: input.convert
             },
         });
         // Update the associated language lead details
@@ -74,6 +76,7 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
                 languageLead: {
                     isNot: null,
                 },
+                archived: false
             },
             include: {
                 country: true,

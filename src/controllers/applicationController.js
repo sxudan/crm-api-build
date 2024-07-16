@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
 const prisma_1 = require("../prisma");
-const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
+const leadController_1 = require("./leadController");
+const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.application.create({
         data: {
             firstname: input.firstname,
@@ -22,7 +23,6 @@ const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
             description: input.description,
             leadId: input.leadId,
             visaStatusId: input.statusId,
-            intakeId: input.intakeId,
             courseId: input.courseId,
             universityId: input.universityId,
             archived: false,
@@ -31,12 +31,15 @@ const addApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
             dob: new Date(input.dob),
             isDirect: input.isDirect,
             subAgentId: input.subagentId,
-            universityAddress: input.universityAddress
+            universityAddress: input.universityAddress,
+            intake: input.intake,
+            year: input.year,
+            converted: converted
         },
     });
 });
 exports.addApplicant = addApplicant;
-const searchApplicants = (query, applicationStatusIds, isDirect, startDate) => __awaiter(void 0, void 0, void 0, function* () {
+const searchApplicants = (query, applicationStatusIds, isDirect, intake, year, country, institution, course) => __awaiter(void 0, void 0, void 0, function* () {
     const applicants = yield prisma_1.prisma.application.findMany({
         where: {
             OR: [
@@ -48,7 +51,11 @@ const searchApplicants = (query, applicationStatusIds, isDirect, startDate) => _
             AND: [
                 { visaStatusId: applicationStatusIds.length === 0 ? undefined : { in: applicationStatusIds } },
                 { isDirect: { equals: isDirect } },
-                { intake: { startDate: { equals: startDate } } }
+                { intake: { equals: intake } },
+                { year: { equals: year } },
+                { countryId: { equals: country } },
+                { universityId: { equals: institution } },
+                { courseId: { equals: course } },
             ]
         },
         include: {
@@ -56,7 +63,6 @@ const searchApplicants = (query, applicationStatusIds, isDirect, startDate) => _
             course: true,
             university: true,
             visaStatus: true,
-            intake: true,
             subAgent: true
         },
     });
@@ -75,11 +81,49 @@ const updateApplicantStatus = (applicantId, statusId) => __awaiter(void 0, void 
 });
 exports.updateApplicantStatus = updateApplicantStatus;
 const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
     // Fetch the existing lead to ensure it exists
     const existingLead = yield prisma_1.prisma.application.findUnique({
         where: { id: input.id },
     });
     if (!existingLead) {
+        if (input.leadId) {
+            try {
+                yield addApplicant({
+                    "firstname": input.firstname,
+                    "lastname": input.lastname,
+                    "email": input.email,
+                    "phone": input.phone,
+                    "dob": (_a = input.dob) !== null && _a !== void 0 ? _a : Date.now(),
+                    "passportCountry": input.passportCountry,
+                    "countryId": input.countryId,
+                    "description": (_b = input.description) !== null && _b !== void 0 ? _b : '',
+                    "intake": input.intake,
+                    "year": input.year,
+                    "courseId": input.courseId,
+                    "universityId": input.universityId,
+                    "universityAddress": input.universityAddress,
+                    "leadId": input.leadId,
+                    "isDirect": (_c = input.isDirect) !== null && _c !== void 0 ? _c : true,
+                    "referer": input.referer,
+                    "statusId": input.statusId,
+                    "subagentId": input.subagentId
+                }, true);
+                prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield tx.lead.update({
+                        where: {
+                            id: input.leadId
+                        },
+                        data: {
+                            converted: true
+                        }
+                    });
+                }));
+            }
+            catch (e) {
+            }
+            return;
+        }
         throw new Error(`Lead with id ${input.id} does not exist.`);
     }
     // Update the lead details
@@ -93,7 +137,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
             countryId: input.countryId,
             description: input.description,
             visaStatusId: input.statusId,
-            intakeId: input.intakeId,
+            intake: input.intake,
             courseId: input.courseId,
             universityId: input.universityId,
             dob: input.dob ? new Date(input.dob) : undefined,
@@ -101,21 +145,21 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
             referer: input.referer,
             isDirect: input.isDirect,
             subAgentId: input.subagentId,
-            universityAddress: input.universityAddress
+            universityAddress: input.universityAddress,
+            year: input.year
         },
     });
 });
 exports.updateApplicant = updateApplicant;
 const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
-    const leads = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+    let leads = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const leads = yield tx.application.findMany({
             include: {
                 country: true,
                 course: true,
                 university: true,
                 visaStatus: true,
-                intake: true,
-                subAgent: true
+                subAgent: true,
             },
             orderBy: {
                 updatedAt: 'desc',
@@ -123,7 +167,63 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
         });
         return leads;
     }));
-    return leads;
+    const _converted = yield (0, leadController_1.getArchivedLeads)();
+    const converted = _converted.map((c) => ({
+        "id": parseInt(c.id + '00100'),
+        "firstname": c.firstname,
+        "lastname": c.lastname,
+        "email": c.email,
+        "phone": c.phone,
+        "dob": undefined,
+        "passportCountry": undefined,
+        "countryId": undefined,
+        "description": "",
+        "createdAt": new Date(),
+        "updatedAt": new Date(),
+        "intake": 0,
+        "year": undefined,
+        "courseId": undefined,
+        "universityId": undefined,
+        "universityAddress": undefined,
+        "leadId": c.id,
+        "visaStatusId": undefined,
+        "archived": c.archived,
+        "isDirect": true,
+        "referer": "",
+        "subAgentId": null,
+        "country": {
+            "id": undefined,
+            "name": undefined,
+            "createdAt": new Date(),
+            "updatedAt": new Date()
+        },
+        "converted": false,
+        "course": {
+            "id": undefined,
+            "name": undefined,
+            "universityId": undefined,
+            "intakes": [],
+            "createdAt": new Date(),
+            "updatedAt": new Date()
+        },
+        "university": {
+            "id": undefined,
+            "name": undefined,
+            "addresses": [],
+            "countryId": undefined,
+            "direct": undefined,
+            "createdAt": "2024-07-03T13:49:24.233Z",
+            "updatedAt": "2024-07-07T13:25:21.334Z"
+        },
+        "visaStatus": {
+            "id": undefined,
+            "name": undefined,
+            "order": undefined,
+            "countryId": undefined
+        },
+        "subAgent": null
+    }));
+    return [...converted, ...leads];
 });
 exports.getApplicants = getApplicants;
 const deleteApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
