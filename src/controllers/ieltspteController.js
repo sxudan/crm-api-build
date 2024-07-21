@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateLanguageLead = exports.deleteLanguageLeads = exports.getLanguageLeads = exports.addLanguageLead = void 0;
 const prisma_1 = require("../prisma");
+const leadController_1 = require("./leadController");
 const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const lead = yield tx.lead.create({
@@ -21,7 +22,7 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
                 phone: input.phone,
                 countryId: input.countryId,
                 description: input.description,
-                priority: input.priority
+                priority: input.priority,
             },
         });
         yield tx.languageLead.create({
@@ -36,12 +37,36 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
 exports.addLanguageLead = addLanguageLead;
 const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b, _c;
         // Fetch the existing lead to ensure it exists
         const existingLead = yield tx.lead.findUnique({
             where: { id: input.id },
         });
         if (!existingLead) {
             throw new Error(`Lead with id ${input.id} does not exist.`);
+        }
+        if (input.toTransfer) {
+            yield addLanguageLead({
+                firstname: input.firstname,
+                lastname: input.lastname,
+                email: (_a = input.email) !== null && _a !== void 0 ? _a : '',
+                phone: (_b = input.phone) !== null && _b !== void 0 ? _b : '',
+                countryId: input.countryId,
+                languageTypeId: input.languageTypeId,
+                admissionTypeId: input.admissionTypeId,
+                priority: input.priority,
+                description: (_c = input.description) !== null && _c !== void 0 ? _c : '',
+            });
+            yield tx.lead.update({
+                where: {
+                    id: input.id
+                },
+                data: {
+                    toTransferToLanguage: false,
+                    transferredToLanguage: true
+                }
+            });
+            return;
         }
         // Update the lead details
         yield tx.lead.update({
@@ -55,7 +80,7 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                 description: input.description,
                 priority: input.priority,
                 archived: input.convert,
-                toConvert: input.convert
+                toConvert: input.convert,
             },
         });
         // Update the associated language lead details
@@ -76,7 +101,7 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
                 languageLead: {
                     isNot: null,
                 },
-                archived: false
+                archived: false,
             },
             include: {
                 country: true,
@@ -89,15 +114,35 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
                 },
             },
             orderBy: {
-                createdAt: 'desc',
-            }
+                createdAt: "desc",
+            },
         });
         return leads.map((x) => {
             var _a, _b, _c;
             return (Object.assign(Object.assign({}, x), { languageLeadId: (_a = x.languageLead) === null || _a === void 0 ? void 0 : _a.id, languageType: (_b = x.languageLead) === null || _b === void 0 ? void 0 : _b.languageType, admissionType: (_c = x.languageLead) === null || _c === void 0 ? void 0 : _c.admissionType, languageLead: undefined }));
         });
     }));
-    return leads;
+    const _drafts = yield (0, leadController_1.getTransferredLead)();
+    const drafts = _drafts.map((draft) => ({
+        id: draft.id,
+        firstname: draft.firstname,
+        lastname: draft.lastname,
+        email: draft.email,
+        phone: draft.phone,
+        countryId: draft.countryId,
+        description: draft.description,
+        converted: false,
+        priority: draft.priority,
+        archived: false,
+        toConvert: false,
+        toTransferToLanguage: true,
+        transferredToLanguage: false,
+        country: draft.country,
+        languageLeadId: undefined,
+        languageType: undefined,
+        admissionType: undefined,
+    }));
+    return [...drafts, ...leads];
 });
 exports.getLanguageLeads = getLanguageLeads;
 const deleteLanguageLeads = (id) => __awaiter(void 0, void 0, void 0, function* () {

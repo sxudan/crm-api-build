@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSubagents = exports.deleteSubAgent = exports.addSubagent = void 0;
+exports.updateSubagent = exports.getSubagents = exports.deleteSubAgent = exports.addSubagent = void 0;
 const prisma_1 = require("../prisma");
 const addSubagent = (agent) => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield prisma_1.prisma.subAgent.create({
@@ -18,6 +18,16 @@ const addSubagent = (agent) => __awaiter(void 0, void 0, void 0, function* () {
     return res;
 });
 exports.addSubagent = addSubagent;
+const updateSubagent = (agent) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield prisma_1.prisma.subAgent.update({
+        where: {
+            id: agent.id
+        },
+        data: Object.assign({}, agent),
+    });
+    return res;
+});
+exports.updateSubagent = updateSubagent;
 const getSubagents = () => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield prisma_1.prisma.subAgent.findMany();
     return res;

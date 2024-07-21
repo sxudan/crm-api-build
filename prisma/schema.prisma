@@ -157,6 +157,8 @@ model Lead {
   priority     Priority
   archived     Boolean       @default(false)
   toConvert    Boolean       @default(false)
+  toTransferToLanguage  Boolean @default(false)
+  transferredToLanguage  Boolean @default(false)
 }
 
 model LanguageType {

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
+exports.getTransferredLead = exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
 const prisma_1 = require("../prisma");
 const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.lead.create({
@@ -36,6 +36,10 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     if (!existingLead) {
         throw new Error(`Lead with id ${input.id} does not exist.`);
     }
+    // guard to prevent toConvert and transferToLanguage to be true
+    if (input.convert == true && input.transfer == true) {
+        throw new Error(`A lead can be converted and transferred at a same time`);
+    }
     // Update the lead details
     yield prisma_1.prisma.lead.update({
         where: { id: input.id },
@@ -47,8 +51,9 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             countryId: input.countryId,
             description: input.description,
             priority: input.priority,
-            archived: input.convert,
-            toConvert: input.convert
+            archived: input.convert || input.transfer,
+            toConvert: input.convert,
+            toTransferToLanguage: input.transfer,
         },
     });
 });
@@ -58,14 +63,14 @@ const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
         const leads = yield tx.lead.findMany({
             where: {
                 languageLead: null,
-                archived: false
+                archived: false,
             },
             include: {
                 country: true,
             },
             orderBy: {
-                createdAt: 'desc',
-            }
+                createdAt: "desc",
+            },
         });
         return leads;
     }));
@@ -84,14 +89,34 @@ const getArchivedLeads = () => __awaiter(void 0, void 0, void 0, function* () {
                 country: true,
             },
             orderBy: {
-                createdAt: 'desc',
-            }
+                createdAt: "desc",
+            },
         });
         return leads;
     }));
     return leads;
 });
 exports.getArchivedLeads = getArchivedLeads;
+const getTransferredLead = () => __awaiter(void 0, void 0, void 0, function* () {
+    const leads = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const leads = yield tx.lead.findMany({
+            where: {
+                archived: true,
+                transferredToLanguage: false,
+                toTransferToLanguage: true,
+            },
+            include: {
+                country: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+        return leads;
+    }));
+    return leads;
+});
+exports.getTransferredLead = getTransferredLead;
 const deleteLead = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         yield tx.lead.deleteMany({

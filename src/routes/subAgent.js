@@ -28,6 +28,16 @@ exports.subAgentRouter.post("/", auth_1.default, access_1.default, (req, res, ne
         next(e);
     }
 }));
+exports.subAgentRouter.put("/", auth_1.default, access_1.default, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const body = req.body;
+        const rs = yield (0, subagentController_1.updateSubagent)(body);
+        res.status(200).send({ success: true, data: rs });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
 exports.subAgentRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;

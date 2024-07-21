@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
+exports.getApplicant = exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
 const prisma_1 = require("../prisma");
 const leadController_1 = require("./leadController");
 const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,7 +34,7 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
             universityAddress: input.universityAddress,
             intake: input.intake,
             year: input.year,
-            converted: converted
+            converted: converted,
         },
     });
 });
@@ -43,27 +43,31 @@ const searchApplicants = (query, applicationStatusIds, isDirect, intake, year, c
     const applicants = yield prisma_1.prisma.application.findMany({
         where: {
             OR: [
-                { firstname: { contains: query, mode: 'insensitive' } },
-                { lastname: { contains: query, mode: 'insensitive' } },
-                { email: { contains: query, mode: 'insensitive' } },
-                { phone: { contains: query, mode: 'insensitive' } },
+                { firstname: { contains: query, mode: "insensitive" } },
+                { lastname: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+                { phone: { contains: query, mode: "insensitive" } },
             ],
             AND: [
-                { visaStatusId: applicationStatusIds.length === 0 ? undefined : { in: applicationStatusIds } },
+                {
+                    visaStatusId: applicationStatusIds.length === 0
+                        ? undefined
+                        : { in: applicationStatusIds },
+                },
                 { isDirect: { equals: isDirect } },
                 { intake: { equals: intake } },
                 { year: { equals: year } },
                 { countryId: { equals: country } },
                 { universityId: { equals: institution } },
                 { courseId: { equals: course } },
-            ]
+            ],
         },
         include: {
             country: true,
             course: true,
             university: true,
             visaStatus: true,
-            subAgent: true
+            subAgent: true,
         },
     });
     return applicants;
@@ -72,11 +76,11 @@ exports.searchApplicants = searchApplicants;
 const updateApplicantStatus = (applicantId, statusId) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.application.update({
         where: {
-            id: applicantId
+            id: applicantId,
         },
         data: {
-            visaStatusId: statusId
-        }
+            visaStatusId: statusId,
+        },
     });
 });
 exports.updateApplicantStatus = updateApplicantStatus;
@@ -90,38 +94,38 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
         if (input.leadId) {
             try {
                 yield addApplicant({
-                    "firstname": input.firstname,
-                    "lastname": input.lastname,
-                    "email": input.email,
-                    "phone": input.phone,
-                    "dob": (_a = input.dob) !== null && _a !== void 0 ? _a : Date.now(),
-                    "passportCountry": input.passportCountry,
-                    "countryId": input.countryId,
-                    "description": (_b = input.description) !== null && _b !== void 0 ? _b : '',
-                    "intake": input.intake,
-                    "year": input.year,
-                    "courseId": input.courseId,
-                    "universityId": input.universityId,
-                    "universityAddress": input.universityAddress,
-                    "leadId": input.leadId,
-                    "isDirect": (_c = input.isDirect) !== null && _c !== void 0 ? _c : true,
-                    "referer": input.referer,
-                    "statusId": input.statusId,
-                    "subagentId": input.subagentId
+                    firstname: input.firstname,
+                    lastname: input.lastname,
+                    email: input.email,
+                    phone: input.phone,
+                    dob: (_a = input.dob) !== null && _a !== void 0 ? _a : Date.now(),
+                    passportCountry: input.passportCountry,
+                    countryId: input.countryId,
+                    description: (_b = input.description) !== null && _b !== void 0 ? _b : "",
+                    intake: input.intake,
+                    year: input.year,
+                    courseId: input.courseId,
+                    universityId: input.universityId,
+                    universityAddress: input.universityAddress,
+                    leadId: input.leadId,
+                    isDirect: (_c = input.isDirect) !== null && _c !== void 0 ? _c : true,
+                    referer: input.referer,
+                    statusId: input.statusId,
+                    subagentId: input.subagentId,
                 }, true);
                 prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
                     yield tx.lead.update({
                         where: {
-                            id: input.leadId
+                            id: input.leadId,
                         },
                         data: {
-                            converted: true
-                        }
+                            converted: true,
+                            toConvert: false,
+                        },
                     });
                 }));
             }
-            catch (e) {
-            }
+            catch (e) { }
             return;
         }
         throw new Error(`Lead with id ${input.id} does not exist.`);
@@ -146,11 +150,26 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
             isDirect: input.isDirect,
             subAgentId: input.subagentId,
             universityAddress: input.universityAddress,
-            year: input.year
+            year: input.year,
         },
     });
 });
 exports.updateApplicant = updateApplicant;
+const getApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.prisma.application.findUnique({
+        where: {
+            id: id,
+        },
+        include: {
+            country: true,
+            course: true,
+            university: true,
+            visaStatus: true,
+            subAgent: true,
+        },
+    });
+});
+exports.getApplicant = getApplicant;
 const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
     let leads = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const leads = yield tx.application.findMany({
@@ -162,66 +181,66 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 subAgent: true,
             },
             orderBy: {
-                updatedAt: 'desc',
-            }
+                updatedAt: "desc",
+            },
         });
         return leads;
     }));
     const _converted = yield (0, leadController_1.getArchivedLeads)();
     const converted = _converted.map((c) => ({
-        "id": parseInt(c.id + '00100'),
-        "firstname": c.firstname,
-        "lastname": c.lastname,
-        "email": c.email,
-        "phone": c.phone,
-        "dob": undefined,
-        "passportCountry": undefined,
-        "countryId": undefined,
-        "description": "",
-        "createdAt": new Date(),
-        "updatedAt": new Date(),
-        "intake": 0,
-        "year": undefined,
-        "courseId": undefined,
-        "universityId": undefined,
-        "universityAddress": undefined,
-        "leadId": c.id,
-        "visaStatusId": undefined,
-        "archived": c.archived,
-        "isDirect": true,
-        "referer": "",
-        "subAgentId": null,
-        "country": {
-            "id": undefined,
-            "name": undefined,
-            "createdAt": new Date(),
-            "updatedAt": new Date()
+        id: parseInt(c.id + "00100"),
+        firstname: c.firstname,
+        lastname: c.lastname,
+        email: c.email,
+        phone: c.phone,
+        dob: undefined,
+        passportCountry: undefined,
+        countryId: undefined,
+        description: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        intake: 0,
+        year: undefined,
+        courseId: undefined,
+        universityId: undefined,
+        universityAddress: undefined,
+        leadId: c.id,
+        visaStatusId: undefined,
+        archived: c.archived,
+        isDirect: true,
+        referer: "",
+        subAgentId: null,
+        country: {
+            id: undefined,
+            name: undefined,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         },
-        "converted": false,
-        "course": {
-            "id": undefined,
-            "name": undefined,
-            "universityId": undefined,
-            "intakes": [],
-            "createdAt": new Date(),
-            "updatedAt": new Date()
+        converted: false,
+        course: {
+            id: undefined,
+            name: undefined,
+            universityId: undefined,
+            intakes: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
         },
-        "university": {
-            "id": undefined,
-            "name": undefined,
-            "addresses": [],
-            "countryId": undefined,
-            "direct": undefined,
-            "createdAt": "2024-07-03T13:49:24.233Z",
-            "updatedAt": "2024-07-07T13:25:21.334Z"
+        university: {
+            id: undefined,
+            name: undefined,
+            addresses: [],
+            countryId: undefined,
+            direct: undefined,
+            createdAt: "2024-07-03T13:49:24.233Z",
+            updatedAt: "2024-07-07T13:25:21.334Z",
         },
-        "visaStatus": {
-            "id": undefined,
-            "name": undefined,
-            "order": undefined,
-            "countryId": undefined
+        visaStatus: {
+            id: undefined,
+            name: undefined,
+            order: undefined,
+            countryId: undefined,
         },
-        "subAgent": null
+        subAgent: null,
     }));
     return [...converted, ...leads];
 });

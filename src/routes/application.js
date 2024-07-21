@@ -52,6 +52,16 @@ exports.applicationRoutes.get("/", (req, res, next) => __awaiter(void 0, void 0,
         next(e);
     }
 }));
+exports.applicationRoutes.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield (0, applicationController_1.getApplicant)(parseInt(id));
+        res.status(200).send({ success: true, data: result });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
 exports.applicationRoutes.post("/search", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { searchText, visaStatusIds, isDirect, intake, year, country, institution, course, } = req.body;
