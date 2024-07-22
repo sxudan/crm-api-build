@@ -13,30 +13,44 @@ exports.getApplicant = exports.searchApplicants = exports.updateApplicantStatus 
 const prisma_1 = require("../prisma");
 const leadController_1 = require("./leadController");
 const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.prisma.application.create({
-        data: {
-            firstname: input.firstname,
-            lastname: input.lastname,
-            email: input.email,
-            phone: input.phone,
-            countryId: input.countryId,
-            description: input.description,
-            leadId: input.leadId,
-            visaStatusId: input.statusId,
-            courseId: input.courseId,
-            universityId: input.universityId,
-            archived: false,
-            passportCountry: input.passportCountry,
-            referer: input.referer,
-            dob: new Date(input.dob),
-            isDirect: input.isDirect,
-            subAgentId: input.subagentId,
-            universityAddress: input.universityAddress,
-            intake: input.intake,
-            year: input.year,
-            converted: converted,
-        },
-    });
+    yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        if (input.assignedTo && input.followUpDate) {
+            yield tx.task.create({
+                data: {
+                    name: `Follow up ${input.firstname} ${input.lastname}`,
+                    description: "",
+                    assignedToId: input.assignedTo,
+                    dueDate: input.followUpDate
+                        ? new Date(input.followUpDate * 1000)
+                        : null,
+                },
+            });
+        }
+        yield tx.application.create({
+            data: {
+                firstname: input.firstname,
+                lastname: input.lastname,
+                email: input.email,
+                phone: input.phone,
+                countryId: input.countryId,
+                description: input.description,
+                leadId: input.leadId,
+                visaStatusId: input.statusId,
+                courseId: input.courseId,
+                universityId: input.universityId,
+                archived: false,
+                passportCountry: input.passportCountry,
+                referer: input.referer,
+                dob: new Date(input.dob),
+                isDirect: input.isDirect,
+                subAgentId: input.subagentId,
+                universityAddress: input.universityAddress,
+                intake: input.intake,
+                year: input.year,
+                converted: converted,
+            },
+        });
+    }));
 });
 exports.addApplicant = addApplicant;
 const searchApplicants = (query, applicationStatusIds, isDirect, intake, year, country, institution, course) => __awaiter(void 0, void 0, void 0, function* () {
@@ -89,6 +103,9 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
     // Fetch the existing lead to ensure it exists
     const existingLead = yield prisma_1.prisma.application.findUnique({
         where: { id: input.id },
+        include: {
+            task: true,
+        },
     });
     if (!existingLead) {
         if (input.leadId) {
@@ -130,29 +147,60 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
         }
         throw new Error(`Lead with id ${input.id} does not exist.`);
     }
-    // Update the lead details
-    yield prisma_1.prisma.application.update({
-        where: { id: input.id },
-        data: {
-            firstname: input.firstname,
-            lastname: input.lastname,
-            email: input.email,
-            phone: input.phone,
-            countryId: input.countryId,
-            description: input.description,
-            visaStatusId: input.statusId,
-            intake: input.intake,
-            courseId: input.courseId,
-            universityId: input.universityId,
-            dob: input.dob ? new Date(input.dob) : undefined,
-            passportCountry: input.passportCountry,
-            referer: input.referer,
-            isDirect: input.isDirect,
-            subAgentId: input.subagentId,
-            universityAddress: input.universityAddress,
-            year: input.year,
-        },
-    });
+    prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _d;
+        const taskId = (_d = existingLead.task) === null || _d === void 0 ? void 0 : _d.id;
+        if (taskId) {
+            tx.task.update({
+                where: {
+                    id: taskId,
+                },
+                data: {
+                    assignedToId: input.assignedTo,
+                    dueDate: input.followUpDate
+                        ? new Date(input.followUpDate * 1000)
+                        : null,
+                },
+            });
+        }
+        else {
+            if (input.assignedTo && input.followUpDate) {
+                yield tx.task.create({
+                    data: {
+                        name: `Follow up ${input.firstname} ${input.lastname}`,
+                        description: "",
+                        assignedToId: input.assignedTo,
+                        dueDate: input.followUpDate
+                            ? new Date(input.followUpDate * 1000)
+                            : null,
+                    },
+                });
+            }
+        }
+        // Update the lead details
+        yield tx.application.update({
+            where: { id: input.id },
+            data: {
+                firstname: input.firstname,
+                lastname: input.lastname,
+                email: input.email,
+                phone: input.phone,
+                countryId: input.countryId,
+                description: input.description,
+                visaStatusId: input.statusId,
+                intake: input.intake,
+                courseId: input.courseId,
+                universityId: input.universityId,
+                dob: input.dob ? new Date(input.dob) : undefined,
+                passportCountry: input.passportCountry,
+                referer: input.referer,
+                isDirect: input.isDirect,
+                subAgentId: input.subagentId,
+                universityAddress: input.universityAddress,
+                year: input.year,
+            },
+        });
+    }));
 });
 exports.updateApplicant = updateApplicant;
 const getApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {

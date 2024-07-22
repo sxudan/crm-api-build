@@ -140,25 +140,38 @@ model Admin {
   updatedAt DateTime @updatedAt // Add updatedAt field
 }
 
+enum LeadServices {
+  TestPreparation
+  TestBooking
+  Counseling
+  Documentation
+  OHSC
+  VirtualCounseling
+  VisitVisa
+  Others
+}
+
 model Lead {
-  id           Int           @id @default(autoincrement())
-  firstname    String
-  lastname     String
-  email        String
-  phone        String
-  country      Country       @relation(fields: [countryId], references: [id])
-  countryId    Int
-  description  String
-  createdAt    DateTime      @default(now()) // Add createdAt field
-  updatedAt    DateTime      @updatedAt // Add updatedAt field
-  languageLead LanguageLead?
-  converted    Boolean       @default(false)
-  application  Application[]
-  priority     Priority
-  archived     Boolean       @default(false)
-  toConvert    Boolean       @default(false)
-  toTransferToLanguage  Boolean @default(false)
-  transferredToLanguage  Boolean @default(false)
+  id                    Int           @id @default(autoincrement())
+  firstname             String
+  lastname              String
+  email                 String
+  phone                 String
+  country               Country       @relation(fields: [countryId], references: [id])
+  countryId             Int
+  description           String
+  createdAt             DateTime      @default(now()) // Add createdAt field
+  updatedAt             DateTime      @updatedAt // Add updatedAt field
+  languageLead          LanguageLead?
+  converted             Boolean       @default(false)
+  application           Application[]
+  priority              Priority
+  archived              Boolean       @default(false)
+  toConvert             Boolean       @default(false)
+  toTransferToLanguage  Boolean       @default(false)
+  transferredToLanguage Boolean       @default(false)
+  service               LeadServices?
+  task                  Task?
 }
 
 model LanguageType {
@@ -184,14 +197,18 @@ model LanguageLead {
 }
 
 model Task {
-  id           Int       @id @default(autoincrement())
-  name         String
-  description  String
-  assignedToId Int
-  assignedTo   Admin     @relation(fields: [assignedToId], references: [userId])
-  dueDate      DateTime?
-  createdAt    DateTime  @default(now()) // Add createdAt field
-  updatedAt    DateTime  @updatedAt // Add updatedAt field
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String
+  assignedToId  Int
+  assignedTo    Admin        @relation(fields: [assignedToId], references: [userId])
+  dueDate       DateTime?
+  createdAt     DateTime     @default(now()) // Add createdAt field
+  updatedAt     DateTime     @updatedAt // Add updatedAt field
+  application   Application? @relation(fields: [applicationId], references: [id])
+  applicationId Int?         @unique
+  leadId        Int?         @unique
+  lead          Lead?        @relation(fields: [leadId], references: [id])
 }
 
 enum Priority {
@@ -231,7 +248,7 @@ model Application {
   subAgentId        Int?
   subAgent          SubAgent?  @relation(fields: [subAgentId], references: [id])
   converted         Boolean    @default(false)
-  // Intake            Intake     @relation(fields: [intakeId], references: [id])
+  task              Task?
 }
 
 model SubAgent {

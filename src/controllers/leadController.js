@@ -24,6 +24,7 @@ const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             converted: false,
             archived: false,
             toConvert: false,
+            service: input.service
         },
     });
 });
@@ -54,6 +55,7 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             archived: input.convert || input.transfer,
             toConvert: input.convert,
             toTransferToLanguage: input.transfer,
+            service: input.service
         },
     });
 });
