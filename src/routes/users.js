@@ -43,6 +43,16 @@ exports.userRoutes.get("/:branchId", (req, res, next) => __awaiter(void 0, void 
         next(e);
     }
 }));
+exports.userRoutes.get("/:branchId/:userId", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { branchId, userId } = req.params;
+        const result = yield (0, userController_1.getUser)(parseInt(userId));
+        res.status(200).send({ success: true, data: result });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
 exports.userRoutes.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;

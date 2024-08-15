@@ -13,7 +13,6 @@ exports.deleteTask = exports.getAllTask = exports.addTask = void 0;
 const prisma_1 = require("../prisma");
 const time_1 = require("../utils/time");
 const addTask = (task) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(task.dueDate);
     yield prisma_1.prisma.task.create({
         data: {
             name: task.name,
@@ -49,10 +48,10 @@ const getAllTask = () => __awaiter(void 0, void 0, void 0, function* () {
         dueDate: t.dueDate ? (0, time_1.dateToEpochSeconds)(t.dueDate) : null,
         assignedTo: {
             id: t.assignedTo.user.id,
-            firstname: t.assignedTo.user.firstname,
-            lastname: t.assignedTo.user.lastname,
+            firstname: t.assignedTo.firstname,
+            lastname: t.assignedTo.lastname,
             email: t.assignedTo.user.email,
-            phone: t.assignedTo.user.phone,
+            phone: t.assignedTo.phone,
             role: t.assignedTo.roleId,
             branchId: t.assignedTo.branchId,
         },

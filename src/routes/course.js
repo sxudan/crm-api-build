@@ -15,8 +15,8 @@ const courseController_1 = require("../controllers/courseController");
 exports.courseRoutes = (0, express_1.Router)();
 exports.courseRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, universityId, intakes } = req.body;
-        const result = yield (0, courseController_1.addCourse)(name, universityId, intakes !== null && intakes !== void 0 ? intakes : []);
+        const body = req.body;
+        const result = yield (0, courseController_1.addCourse)(body);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {
@@ -25,8 +25,8 @@ exports.courseRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, voi
 }));
 exports.courseRoutes.put("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, name, universityId, intakes } = req.body;
-        const result = yield (0, courseController_1.updateCourse)(id, name, universityId, intakes);
+        const body = req.body;
+        const result = yield (0, courseController_1.updateCourse)(body);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {
@@ -54,6 +54,24 @@ exports.courseRoutes.delete("/:id", (req, res, next) => __awaiter(void 0, void 0
         const { id } = req.params;
         yield (0, courseController_1.deleteCourse)(parseInt(id));
         res.status(200).send({ success: true });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
+exports.courseRoutes.get("/courseFields", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const fields = yield (0, courseController_1.fetchGetCourseFields)();
+        res.status(200).send({ success: true, data: fields });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
+exports.courseRoutes.get("/courseLevels", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const fields = yield (0, courseController_1.fetchGetCourseLevels)();
+        res.status(200).send({ success: true, data: fields });
     }
     catch (e) {
         next(e);

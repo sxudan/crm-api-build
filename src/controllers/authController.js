@@ -33,7 +33,7 @@ const generateTokens = (id, role) => {
     };
 };
 const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
-    const u = yield prisma_1.prisma.admin.findFirst({
+    const u = yield prisma_1.prisma.profile.findFirst({
         where: {
             user: {
                 email: credential.email,
@@ -55,10 +55,6 @@ const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
         if (hashed == user.password) {
             const admin = {
                 id: u.userId,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                dob: undefined,
-                phone: user.phone,
                 email: user.email,
                 role: u.roleId,
                 branchId: u.branchId,
@@ -90,29 +86,31 @@ const signup = (user) => __awaiter(void 0, void 0, void 0, function* () {
         .update(user.password)
         .digest("hex");
     const response = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         const u = yield tx.user.create({
+            data: {
+                email: user.email,
+                password: hashedPassword,
+            },
+        });
+        console.log(user);
+        const profile = yield tx.profile.create({
             data: {
                 firstname: user.firstname,
                 lastname: user.lastname,
-                email: user.email,
-                password: hashedPassword,
-                phone: (_a = user.phone) !== null && _a !== void 0 ? _a : "",
-            },
-        });
-        yield tx.admin.create({
-            data: {
                 userId: u.id,
+                dob: user.dob ? new Date(user.dob) : undefined,
+                phone: user.phone,
                 roleId: user.userType,
-                branchId: constants_1.Branch.KamalPokhari,
-            },
+                branchId: constants_1.Branch.KamalPokhari
+            }
         });
         const admin = {
             id: u.id,
-            firstname: u.firstname,
-            lastname: u.lastname,
-            dob: undefined,
-            phone: u.phone,
+            firstname: profile.firstname,
+            lastname: profile.lastname,
+            dob: (_b = (_a = profile.dob) === null || _a === void 0 ? void 0 : _a.getDate()) !== null && _b !== void 0 ? _b : null,
+            phone: profile.phone,
             email: u.email,
             role: user.userType,
             branchId: user.branchId,

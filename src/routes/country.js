@@ -15,8 +15,8 @@ const countryController_1 = require("../controllers/countryController");
 exports.countryRoutes = (0, express_1.Router)();
 exports.countryRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name } = req.body;
-        const result = yield (0, countryController_1.addCountry)(name);
+        const { name, description } = req.body;
+        const result = yield (0, countryController_1.addCountry)(name, description);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {
@@ -44,8 +44,8 @@ exports.countryRoutes.delete("/:id", (req, res, next) => __awaiter(void 0, void 
 }));
 exports.countryRoutes.put("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, name } = req.body;
-        const result = yield (0, countryController_1.updateCountry)(id, name);
+        const { id, name, description } = req.body;
+        const result = yield (0, countryController_1.updateCountry)(id, name, description);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {

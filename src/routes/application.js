@@ -64,8 +64,8 @@ exports.applicationRoutes.get("/:id", (req, res, next) => __awaiter(void 0, void
 }));
 exports.applicationRoutes.post("/search", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { searchText, visaStatusIds, isDirect, intake, year, country, institution, course, } = req.body;
-        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusIds, isDirect, intake, year, country ? parseInt(country) : undefined, institution ? parseInt(institution) : undefined, course ? parseInt(course) : undefined);
+        const { searchText, visaStatusIds, isDirect, intake, years, country, institution, course, intakes } = req.body;
+        const result = yield (0, applicationController_1.searchApplicants)(searchText, visaStatusIds, isDirect, intake, years, country ? parseInt(country) : undefined, institution ? parseInt(institution) : undefined, course ? parseInt(course) : undefined, intakes);
         res.status(200).send({ success: true, data: result });
     }
     catch (e) {

@@ -23,6 +23,7 @@ datasource db {
 model Country {
   id              Int           @id @default(autoincrement())
   name            String        @unique
+  description     String?
   universities    University[]
   leads           Lead[]
   createdAt       DateTime      @default(now()) // Add createdAt field
@@ -31,28 +32,91 @@ model Country {
   visaStatusLists VisaStatus[]
 }
 
+model UniversityScholarshipRequirement {
+  id                     Int          @id @default(autoincrement())
+  academicRequirement    String?
+  ieltsRequirement       String?
+  pteRequirement         String?
+  toeflRequirement       String?
+  scholarshipRequirement String?
+  otherRequirement  String?
+  comments               String?
+  universities           University[]
+  courses Course[]
+}
+
 model University {
-  id           Int           @id @default(autoincrement())
-  name         String
-  country      Country       @relation(fields: [countryId], references: [id])
-  addresses    String[]
+  id            Int       @id @default(autoincrement())
+  name          String
+  country       Country   @relation(fields: [countryId], references: [id])
+  addresses     String[]
+  longAddresses Address[]
   countryId    Int
   direct       Boolean
   courses      Course[]
   applications Application[]
-  createdAt    DateTime      @default(now()) // Add createdAt field
-  updatedAt    DateTime      @updatedAt // Add updatedAt field
+  websiteUrl    String?
+  requirement   UniversityScholarshipRequirement? @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  requirementId Int? @unique
+  contactPersonName        String?
+  contactPersonJobTitle    String?
+  contactPersonEmail       String?
+  contactPersonPhoneNumber String?
+  comments String?
+  createdAt DateTime @default(now()) // Add createdAt field
+  updatedAt DateTime @updatedAt // Add updatedAt field
 }
 
+model CourseField {
+  id           Int             @id @default(autoincrement())
+  name         String
+  comment  String?
+}
+
+model CourseLevel {
+  id           Int             @id @default(autoincrement())
+  name         String
+  comment  String?
+}
+
+model Currency {
+  id           Int             @id @default(autoincrement())
+  symbol  String
+  code  String @unique
+
+  bookings  Booking[]
+  courses Course[]
+}
 model Course {
-  id           Int           @id @default(autoincrement())
+  id           Int             @id @default(autoincrement())
   name         String
   universityId Int
-  university   University    @relation(fields: [universityId], references: [id])
+  description String?
+
+  courseField String?
+  courseLevel String?
+  university   University      @relation(fields: [universityId], references: [id])
+  addresses    AddressCourse[]
   applications Application[]
   intakes      Int[]
-  createdAt    DateTime      @default(now()) // Add createdAt field
-  updatedAt    DateTime      @updatedAt // Add updatedAt field
+  duration  Int?
+  annualTuitionFees Float?
+  currencyCode  String?
+  currency  Currency? @relation(fields: [currencyCode], references: [code])
+  requirementId Int?
+  requirement UniversityScholarshipRequirement? @relation(fields: [requirementId], references: [id])
+
+  createdAt    DateTime        @default(now()) // Add createdAt field
+  updatedAt    DateTime        @updatedAt // Add updatedAt field
+}
+
+model AddressCourse {
+  addressId Int
+  courseId  Int
+  address   Address @relation(fields: [addressId], references: [id])
+  course    Course  @relation(fields: [courseId], references: [id])
+
+  @@id([addressId, courseId])
 }
 
 model VisaStatus {
@@ -89,48 +153,58 @@ model VisaStatus {
 //   @@unique([courseId, intakeId])
 // }
 
-model User {
+enum Gender {
+  Male
+  Female
+  Others
+}
+
+model Experience {
   id        Int       @id @default(autoincrement())
+  jobTitle  String
+  companyName String
+  experienceYears Float
+
+  profile ExperienceProfile[]
+}
+
+model ExperienceProfile {
+  id        Int       @id @default(autoincrement())
+  experienceId Int
+  profileId Int
+
+  experience Experience @relation(fields: [experienceId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  @@unique([experienceId, profileId])
+}
+
+model Reference {
+  id        Int       @id @default(autoincrement())
+  name  String
+  phone String?
+  email String?
+
+  profile ReferenceProfile[]
+}
+
+model ReferenceProfile {
+  id        Int       @id @default(autoincrement())
+  referenceId Int
+  profileId Int
+
+  reference Reference @relation(fields: [referenceId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  @@unique([referenceId, profileId])
+}
+model Profile {
+  id        Int       @id @default(autoincrement())
+  userId  Int @unique 
+  user  User  @relation(fields: [userId], references: [id])
   firstname String
   lastname  String
-  email     String    @unique
-  phone     String
-  dob       DateTime?
-  password  String
-  admin     Admin?
-  createdAt DateTime  @default(now()) // Add createdAt field
-  updatedAt DateTime  @updatedAt // Add updatedAt field
-}
 
-model Branch {
-  id        Int      @id @default(autoincrement())
-  name      String
-  addressId Int      @unique
-  address   Address  @relation(fields: [addressId], references: [id])
-  admins    Admin[]
-  createdAt DateTime @default(now()) // Add createdAt field
-  updatedAt DateTime @updatedAt // Add updatedAt field
-}
-
-model Address {
-  id         Int     @id @default(autoincrement())
-  street1    String
-  street2    String?
-  city       String
-  state      String
-  postalcode String
-  branch     Branch?
-}
-
-model Role {
-  id     Int     @id @default(autoincrement())
-  name   String
-  admins Admin[]
-}
-
-model Admin {
-  userId    Int      @id
-  user      User     @relation(fields: [userId], references: [id])
   role      Role     @relation(fields: [roleId], references: [id])
   roleId    Int
   branchId  Int
@@ -138,7 +212,103 @@ model Admin {
   tasks     Task[]
   createdAt DateTime @default(now()) // Add createdAt field
   updatedAt DateTime @updatedAt // Add updatedAt field
+
+
+  phone     String?
+  dob       DateTime?
+  gender  Gender?
+  nationality String?
+  
+  passportNumber String?
+  passportExpiryDate  DateTime?
+  nationalIdNumber  String?
+
+  emergencyContactName  String?
+  relationshipToEmergencyContact  String?
+  emergencyContactPhoneNumber String?
+
+  educationalBackgroundCourse  String?
+  educationalBackgroundLevelOfEduction  String?
+  educationalBackgroundNameOfInstitution  String?
+  educationalBackgroundYearOfGraduation Int?
+  educationalBackgroundFieldOfStudy String?
+
+  employmentJobTitle  String?
+  employmentDepartment  String?
+  employmentDateOfJoining DateTime?
+  employmentEmployeeId  String?
+
+  socialLinkLinkedIn String?
+  socialLinkFacebook  String?
+  socialLinkOther String?
+
+  experiences  ExperienceProfile[]
+
+  travelHistory Boolean?
+  travelHistoryPurpose String?
+  travelHistoryCountry  String?
+  travelHistoryYear Int?
+
+  interests  String[]
+  volunteerExperience Boolean?
+  references  ReferenceProfile[]
+
+  bookings  ClassBooking[]
+
+  @@unique([id, userId])
 }
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  username  String? @unique
+  createdAt DateTime  @default(now()) // Add createdAt field
+  updatedAt DateTime  @updatedAt // Add updatedAt field
+  profile Profile?
+}
+
+model Branch {
+  id        Int      @id @default(autoincrement())
+  name      String
+  addressId Int      @unique
+  address   Address  @relation(fields: [addressId], references: [id])
+  admins    Profile[]
+  createdAt DateTime @default(now()) // Add createdAt field
+  updatedAt DateTime @updatedAt // Add updatedAt field
+}
+
+model Address {
+  id           Int             @id @default(autoincrement())
+  street1      String
+  street2      String?
+  city         String
+  state        String
+  postalcode   String
+  universityId Int?
+  university   University?     @relation(fields: [universityId], references: [id])
+  branch       Branch?
+  applicant    Application?
+  courses      AddressCourse[]
+}
+
+model Role {
+  id     Int     @id @default(autoincrement())
+  name   String
+  profiles Profile[]
+}
+
+// model Admin {
+//   userId    Int      @id
+//   user      User     @relation(fields: [userId], references: [id])
+//   role      Role     @relation(fields: [roleId], references: [id])
+//   roleId    Int
+//   branchId  Int
+//   branch    Branch   @relation(fields: [branchId], references: [id])
+//   tasks     Task[]
+//   createdAt DateTime @default(now()) // Add createdAt field
+//   updatedAt DateTime @updatedAt // Add updatedAt field
+// }
 
 enum LeadServices {
   TestPreparation
@@ -148,7 +318,36 @@ enum LeadServices {
   OHSC
   VirtualCounseling
   VisitVisa
+  PSW
   Others
+}
+
+enum Features {
+  Instituition
+  Course
+  Lead
+  Language
+  Application
+  Task
+  User
+  Country
+  SubAgent
+  Auth
+}
+
+enum Event {
+  Create
+  Update
+  Delete
+}
+
+model Logs {
+  id                    Int           @id @default(autoincrement())
+  title String
+  event Event
+  feature Features
+  externalId  Int
+  createdAt DateTime @default(now()) // Add createdAt field
 }
 
 model Lead {
@@ -157,8 +356,12 @@ model Lead {
   lastname              String
   email                 String
   phone                 String
-  country               Country       @relation(fields: [countryId], references: [id])
-  countryId             Int
+  country               Country?       @relation(fields: [countryId], references: [id])
+  countryId             Int?
+  courseName  String?
+  graduationYear  Int?
+  referredFrom  String?
+  courseLevel String?
   description           String
   createdAt             DateTime      @default(now()) // Add createdAt field
   updatedAt             DateTime      @updatedAt // Add updatedAt field
@@ -172,6 +375,9 @@ model Lead {
   transferredToLanguage Boolean       @default(false)
   service               LeadServices?
   task                  Task?
+  passportCountry String?
+  lastCheckedIn DateTime?
+  dob DateTime?
 }
 
 model LanguageType {
@@ -186,6 +392,62 @@ model LanguageAdmissionType {
   languageLeads LanguageLead[]
 }
 
+enum PaymentStatus {
+  Paid
+  UnPaid
+  PartiallyPaid
+}
+
+enum PaymentMode {
+  Cash
+  Online
+}
+
+enum BookingStatus {
+  Pending
+  Booked
+  Refunded
+}
+
+model Booking {
+  id               Int                   @id @default(autoincrement())
+  name  String
+  bookedDate  DateTime
+  paymentStatus PaymentStatus
+  paymentMode PaymentMode
+  venue String
+  currencyCode  String
+  currency  Currency @relation(fields: [currencyCode], references: [code])
+  amount  Float
+  receivedBy  String
+  status  BookingStatus
+  comments  String
+  languageLeads LanguageLead[]
+}
+
+// model ClassShift {
+//   id               Int                   @id @default(autoincrement())
+//   name  String  @unique
+
+//   classes ClassBooking[]
+// }
+
+model ClassBooking {
+  id               Int                   @id @default(autoincrement())
+  name  String
+  commencementDate  DateTime?
+  paymentStatus PaymentStatus
+  shift String?
+  currencyCode  String  
+  amount  Float
+  receivedBy  String
+  instructorId Int?
+  instructor Profile? @relation(fields: [instructorId], references: [id])
+  comments  String
+
+  languageLeads LanguageLead[]
+}
+
 model LanguageLead {
   id               Int                   @id @default(autoincrement())
   lead             Lead                  @relation(fields: [leadId], references: [id])
@@ -194,6 +456,11 @@ model LanguageLead {
   languageTypeId   Int
   admissionType    LanguageAdmissionType @relation(fields: [addmissionTypeId], references: [id])
   addmissionTypeId Int
+  enrollmentDate  DateTime?
+  bookingId Int?
+  booking Booking? @relation(fields: [bookingId], references: [id])
+  classBookingId Int?
+  classBooking ClassBooking? @relation(fields: [classBookingId], references: [id])
 }
 
 model Task {
@@ -201,7 +468,7 @@ model Task {
   name          String
   description   String
   assignedToId  Int
-  assignedTo    Admin        @relation(fields: [assignedToId], references: [userId])
+  assignedTo    Profile        @relation(fields: [assignedToId], references: [id])
   dueDate       DateTime?
   createdAt     DateTime     @default(now()) // Add createdAt field
   updatedAt     DateTime     @updatedAt // Add updatedAt field
@@ -218,37 +485,40 @@ enum Priority {
 }
 
 model Application {
-  id                Int        @id @default(autoincrement())
-  firstname         String
-  lastname          String
-  email             String
-  phone             String
-  dob               DateTime
-  passportCountry   String
-  country           Country    @relation(fields: [countryId], references: [id])
-  countryId         Int
-  description       String
-  createdAt         DateTime   @default(now()) // Add createdAt field
-  updatedAt         DateTime   @updatedAt // Add updatedAt field
+  id                      Int        @id @default(autoincrement())
+  firstname               String
+  lastname                String
+  email                   String
+  phone                   String
+  dob                     DateTime
+  passportCountry         String
+  country                 Country    @relation(fields: [countryId], references: [id])
+  countryId               Int
+  description             String
+  createdAt               DateTime   @default(now()) // Add createdAt field
+  updatedAt               DateTime   @updatedAt // Add updatedAt field
   // intake            Intake     @relation(fields: [intakeId], references: [id])
-  intake            Int
-  year              Int
-  courseId          Int
-  course            Course     @relation(fields: [courseId], references: [id])
-  universityId      Int
-  university        University @relation(fields: [universityId], references: [id])
-  universityAddress String?
-  leadId            Int?
-  lead              Lead?      @relation(fields: [leadId], references: [id])
-  visaStatusId      Int
-  visaStatus        VisaStatus @relation(fields: [visaStatusId], references: [id])
-  archived          Boolean
-  isDirect          Boolean
-  referer           String?
-  subAgentId        Int?
-  subAgent          SubAgent?  @relation(fields: [subAgentId], references: [id])
-  converted         Boolean    @default(false)
-  task              Task?
+  intake                  Int
+  year                    Int
+  courseId                Int
+  course                  Course     @relation(fields: [courseId], references: [id])
+  universityId            Int
+  university              University @relation(fields: [universityId], references: [id])
+  universityAddress       String?
+  universityLongAddressId Int        @unique
+  universityLongAddress   Address    @relation(fields: [universityLongAddressId], references: [id])
+
+  leadId       Int?
+  lead         Lead?      @relation(fields: [leadId], references: [id])
+  visaStatusId Int
+  visaStatus   VisaStatus @relation(fields: [visaStatusId], references: [id])
+  archived     Boolean
+  isDirect     Boolean
+  referer      String?
+  subAgentId   Int?
+  subAgent     SubAgent?  @relation(fields: [subAgentId], references: [id])
+  converted    Boolean    @default(false)
+  task         Task?
 }
 
 model SubAgent {

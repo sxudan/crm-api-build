@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTransferredLead = exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
+exports.getLeadById = exports.getTransferredLead = exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
 const prisma_1 = require("../prisma");
 const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.lead.create({
@@ -24,7 +24,12 @@ const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             converted: false,
             archived: false,
             toConvert: false,
-            service: input.service
+            service: input.service,
+            dob: input.dob ? new Date(input.dob) : undefined,
+            courseLevel: input.courseLevel,
+            courseName: input.courseName,
+            passportCountry: input.passportCountry,
+            graduationYear: input.graduationYear
         },
     });
 });
@@ -55,7 +60,12 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             archived: input.convert || input.transfer,
             toConvert: input.convert,
             toTransferToLanguage: input.transfer,
-            service: input.service
+            service: input.service,
+            dob: input.dob ? new Date(input.dob) : undefined,
+            courseLevel: input.courseLevel,
+            courseName: input.courseName,
+            passportCountry: input.passportCountry,
+            graduationYear: input.graduationYear
         },
     });
 });
@@ -79,6 +89,20 @@ const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
     return leads;
 });
 exports.getLeads = getLeads;
+const getLeadById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const lead = yield prisma_1.prisma.lead.findUnique({
+        where: {
+            languageLead: null,
+            archived: false,
+            id: id
+        },
+        include: {
+            country: true,
+        },
+    });
+    return lead;
+});
+exports.getLeadById = getLeadById;
 const getArchivedLeads = () => __awaiter(void 0, void 0, void 0, function* () {
     const leads = yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const leads = yield tx.lead.findMany({

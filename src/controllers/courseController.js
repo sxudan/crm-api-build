@@ -9,61 +9,143 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCoursesByUniversity = exports.updateCourse = exports.getCourses = exports.deleteCourse = exports.addCourse = void 0;
+exports.fetchGetCourseLevels = exports.fetchGetCourseFields = exports.getCoursesByUniversity = exports.updateCourse = exports.getCourses = exports.deleteCourse = exports.addCourse = void 0;
 const prisma_1 = require("../prisma");
-const addCourse = (courseName, universityId, intakes) => __awaiter(void 0, void 0, void 0, function* () {
+const addCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        const course = yield tx.course.create({
+        const requirement = yield tx.universityScholarshipRequirement.create({
             data: {
-                name: courseName,
-                universityId: universityId,
-                intakes: intakes
+                pteRequirement: input.pteRequirement,
+                ieltsRequirement: input.ieltsRequirement,
+                toeflRequirement: input.toeflRequirement,
+                academicRequirement: input.academicRequirement,
+                scholarshipRequirement: input.scholarshipRequirement,
+                comments: input.requirementComments,
+                otherRequirement: input.otherRequirement,
             },
         });
-        // for(let intakeId of intakeIds) {
-        //   await tx.courseUniversityIntake.create({
-        //     data: {
-        //       intakeId: intakeId,
-        //       courseId: course.id
-        //     }
-        //   })
-        // }
+        const course = yield tx.course.create({
+            data: {
+                name: input.courseName,
+                universityId: input.universityId,
+                intakes: input.intakes,
+                courseField: input.courseField,
+                courseLevel: input.courseLevel,
+                duration: input.duration,
+                annualTuitionFees: input.annualTuitionFees,
+                currencyCode: input.prefferedCurrencyCode,
+                requirementId: requirement.id,
+            },
+        });
+        for (const addressId of input.addresses) {
+            yield tx.addressCourse.create({
+                data: {
+                    addressId: addressId,
+                    courseId: course.id,
+                },
+            });
+        }
     }));
     return null;
 });
 exports.addCourse = addCourse;
-const updateCourse = (courseId, courseName, universityId, intakes) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchGetCourseFields = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.prisma.courseField.findMany();
+});
+exports.fetchGetCourseFields = fetchGetCourseFields;
+const fetchGetCourseLevels = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.prisma.courseLevel.findMany();
+});
+exports.fetchGetCourseLevels = fetchGetCourseLevels;
+const updateCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
+        console.log(input);
         // Fetch the existing course to ensure it exists
         const existingCourse = yield tx.course.findUnique({
-            where: { id: courseId },
+            where: { id: input.id },
         });
         if (!existingCourse) {
-            throw new Error(`Course with id ${courseId} does not exist.`);
+            throw new Error(`Course with id ${input.id} does not exist.`);
         }
         // Update the course name if it's provided
-        if (courseName) {
-            yield tx.course.update({
-                where: { id: courseId },
-                data: { name: courseName, universityId: universityId, intakes: intakes },
+        if (input.courseName) {
+            let requirementId = existingCourse.requirementId;
+            if (requirementId) {
+                yield tx.universityScholarshipRequirement.update({
+                    where: {
+                        id: requirementId,
+                    },
+                    data: {
+                        pteRequirement: input.pteRequirement,
+                        ieltsRequirement: input.ieltsRequirement,
+                        toeflRequirement: input.toeflRequirement,
+                        academicRequirement: input.academicRequirement,
+                        scholarshipRequirement: input.scholarshipRequirement,
+                        comments: input.requirementComments,
+                    },
+                });
+            }
+            else {
+                const requirement = yield tx.universityScholarshipRequirement.create({
+                    data: {
+                        pteRequirement: input.pteRequirement,
+                        ieltsRequirement: input.ieltsRequirement,
+                        toeflRequirement: input.toeflRequirement,
+                        academicRequirement: input.academicRequirement,
+                        scholarshipRequirement: input.scholarshipRequirement,
+                        comments: input.requirementComments,
+                        otherRequirement: input.otherRequirement,
+                    },
+                });
+                requirementId = requirement.id;
+            }
+            const course = yield tx.course.update({
+                where: { id: input.id },
+                data: {
+                    name: input.courseName,
+                    universityId: input.universityId,
+                    intakes: input.intakes,
+                    courseField: input.courseField,
+                    courseLevel: input.courseLevel,
+                    duration: input.duration,
+                    annualTuitionFees: input.annualTuitionFees,
+                    currencyCode: input.prefferedCurrencyCode,
+                    requirementId: requirementId,
+                },
+                include: {
+                    addresses: {
+                        include: {
+                            address: true,
+                        },
+                    },
+                },
             });
+            const existingAddresses = course.addresses.map((e) => e.address.id);
+            const newIds = (_a = input.addresses) === null || _a === void 0 ? void 0 : _a.filter((a) => !existingAddresses.includes(a));
+            const editIds = (_b = input.addresses) === null || _b === void 0 ? void 0 : _b.filter((a) => existingAddresses.includes(a));
+            const exludedId = existingAddresses.filter((x) => { var _a; return !((_a = input.addresses) === null || _a === void 0 ? void 0 : _a.includes(x)); });
+            // delete the course id from the address
+            for (const addressId of exludedId) {
+                yield tx.addressCourse.delete({
+                    where: {
+                        addressId_courseId: {
+                            addressId: addressId,
+                            courseId: course.id,
+                        },
+                    },
+                });
+            }
+            // new ids to create
+            for (const addressId of newIds !== null && newIds !== void 0 ? newIds : []) {
+                yield tx.addressCourse.create({
+                    data: {
+                        addressId: addressId,
+                        courseId: course.id,
+                    },
+                });
+            }
         }
-        // Update the associated universities if they're provided
-        // if (universityId) {
-        //   // Remove existing associations
-        //   await tx.courseUniversityIntake.deleteMany({
-        //     where: { courseId: courseId },
-        //   });
-        //   // Add new associations
-        //   for (const id of intakeIds ?? []) {
-        //     await tx.courseUniversityIntake.create({
-        //       data: {
-        //         courseId: courseId,
-        //         intakeId: id,
-        //       },
-        //     });
-        //   }
-        // }
     }));
     return null;
 });
@@ -95,10 +177,22 @@ const getCourses = () => __awaiter(void 0, void 0, void 0, function* () {
             id: true,
             name: true,
             university: true,
-            intakes: true
+            intakes: true,
+            addresses: {
+                select: {
+                    address: true,
+                },
+            },
+            requirement: true,
+            annualTuitionFees: true,
+            currencyCode: true,
+            courseField: true,
+            courseLevel: true,
+            duration: true,
+            description: true,
         },
     });
-    const flattenedCourses = courses.map((course) => (Object.assign({}, course)));
+    const flattenedCourses = courses.map((course) => (Object.assign(Object.assign({}, course), { addresses: course.addresses.map((x) => x.address) })));
     return flattenedCourses;
 });
 exports.getCourses = getCourses;
@@ -111,10 +205,15 @@ const getCoursesByUniversity = (universityId) => __awaiter(void 0, void 0, void 
             id: true,
             name: true,
             university: true,
-            intakes: true
+            intakes: true,
+            addresses: {
+                include: {
+                    address: true,
+                },
+            },
         },
     });
-    const flattenedCourses = courses.map((course) => (Object.assign({}, course)));
+    const flattenedCourses = courses.map((course) => (Object.assign(Object.assign({}, course), { addresses: course.addresses.map((x) => x.address) })));
     return flattenedCourses;
 });
 exports.getCoursesByUniversity = getCoursesByUniversity;

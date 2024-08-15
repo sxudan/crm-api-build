@@ -10,10 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const authController_1 = require("../src/controllers/authController");
+const types_1 = require("../src/models/types");
 const prisma_1 = require("../src/prisma");
-const ROLES = ['Superadmin', 'Counsellor', 'Frontdesk', 'Account'];
-const LANGUAGETYPES = ['IELTS', 'PTE'];
-const ADMISSIONTYPES = ['Class', 'Booking'];
+const constants_1 = require("../src/utils/constants");
+const ROLES = ["Superadmin", "Counsellor", "Frontdesk", "Account"];
+const LANGUAGETYPES = ["IELTS", "PTE"];
+const ADMISSIONTYPES = ["Class", "Booking"];
 const Seed = {
     createRoles: () => __awaiter(void 0, void 0, void 0, function* () {
         yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57,26 +60,71 @@ const Seed = {
         yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
             const address = yield tx.address.create({
                 data: {
-                    street1: 'Pashupati Rd, Kamal Pokhari',
-                    city: 'Kathmandu',
-                    state: 'Bagmati',
-                    postalcode: '44600'
-                }
+                    street1: "Pashupati Rd, Kamal Pokhari",
+                    city: "Kathmandu",
+                    state: "Bagmati",
+                    postalcode: "44600",
+                },
             });
             yield tx.branch.create({
                 data: {
                     addressId: address.id,
-                    name: 'Kamal Pokhari'
-                }
+                    name: "Kamal Pokhari",
+                },
             });
         }));
+    }),
+    createCourseFields: () => __awaiter(void 0, void 0, void 0, function* () {
+        const fields = [
+            "Management & Commerce",
+            "Information Technology",
+            "Engineering & Related Technologies",
+            "Architecture & Building",
+            "Hospitality & Tourism",
+            "Health",
+            "Agriculture, Environment & Related Studies",
+            "Natural & Physical Sciences",
+            "Education",
+            "Society & Culture",
+            "Creative Arts",
+            "Mixed Field Programs",
+        ];
+        yield prisma_1.prisma.courseField.createMany({
+            data: fields.map((field) => ({ name: field })),
+        });
+    }),
+    createCourseLevels: () => __awaiter(void 0, void 0, void 0, function* () {
+        const levels = ["Masters by Research", "Masters", "Bachelors", "Diploma"];
+        yield prisma_1.prisma.courseLevel.createMany({
+            data: levels.map((field) => ({ name: field })),
+        });
+    }),
+    createAdmin: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, authController_1.signup)({
+            firstname: 'Sudan',
+            lastname: 'Suwal',
+            branchId: constants_1.Branch.KamalPokhari,
+            userType: types_1.Roles.Superadmin,
+            email: 'sudosuwal@gmail.com',
+            password: 'Password1@'
+        });
+    }),
+    createCurrencies: () => __awaiter(void 0, void 0, void 0, function* () {
+        const currencies = [{ symbol: '$', code: 'AUD' }, { symbol: '$', code: 'USD' }, { symbol: '£', code: 'GBP' }];
+        yield prisma_1.prisma.currency.createMany({
+            data: currencies
+        });
     })
 };
 const migrate = () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('migrating....');
+    console.log("migrating....");
     yield Seed.createRoles();
     yield Seed.createLanguageTypes();
     yield Seed.createAdmissionTypes();
     yield Seed.createAddress_Branch();
+    yield Seed.createCourseFields();
+    yield Seed.createCourseLevels();
+    yield Seed.createAdmin();
+    yield Seed.createCurrencies();
 });
 migrate();

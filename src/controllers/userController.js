@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -24,29 +35,63 @@ const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const u = yield tx.user.create({
             data: {
-                firstname: user.firstname,
-                lastname: user.lastname,
                 email: user.email,
                 password: hashedPassword,
-                phone: (_a = user.phone) !== null && _a !== void 0 ? _a : "",
             },
         });
-        yield tx.admin.create({
+        const profile = yield tx.profile.create({
             data: {
                 userId: u.id,
-                roleId: user.userType,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                phone: (_a = user.phone) !== null && _a !== void 0 ? _a : "",
+                roleId: user.role,
                 branchId: user.branchId,
+                gender: user.gender,
+                nationality: user.nationality,
+                passportNumber: user.passportNumber,
+                passportExpiryDate: user.passportExpiryDate ? new Date(user.passportExpiryDate) : undefined,
+                nationalIdNumber: user.nationalIdNumber,
+                educationalBackgroundFieldOfStudy: user.educationalBackgroundFieldOfStudy,
+                educationalBackgroundLevelOfEduction: user.educationalBackgroundLevelOfEduction,
+                educationalBackgroundYearOfGraduation: user.educationalBackgroundYearOfGraduation,
+                educationalBackgroundCourse: user.educationalBackgroundCourse,
+                educationalBackgroundNameOfInstitution: user.educationalBackgroundNameOfInstitution,
+                socialLinkFacebook: user.socialLinkFacebook,
+                socialLinkLinkedIn: user.socialLinkLinkedIn,
+                socialLinkOther: user.socialLinkOther,
+                employmentJobTitle: user.employmentJobTitle,
+                employmentDepartment: user.employmentDepartment,
+                employmentDateOfJoining: user.employmentDateOfJoining ? new Date(user.employmentDateOfJoining) : undefined,
+                employmentEmployeeId: user.employmentEmployeeId,
             },
         });
         const admin = {
             id: u.id,
-            firstname: u.firstname,
-            lastname: u.lastname,
-            dob: undefined,
-            phone: u.phone,
+            firstname: profile.firstname,
+            lastname: profile.lastname,
+            dob: profile.dob,
+            phone: profile.phone,
             email: u.email,
-            role: user.userType,
+            role: user.role,
             branchId: user.branchId,
+            gender: user.gender,
+            nationality: user.nationality,
+            passportNumber: user.passportNumber,
+            passportExpiryDate: user.passportExpiryDate ? new Date(user.passportExpiryDate) : undefined,
+            nationalIdNumber: user.nationalIdNumber,
+            educationalBackgroundFieldOfStudy: user.educationalBackgroundFieldOfStudy,
+            educationalBackgroundLevelOfEduction: user.educationalBackgroundLevelOfEduction,
+            educationalBackgroundYearOfGraduation: user.educationalBackgroundYearOfGraduation,
+            educationalBackgroundCourse: user.educationalBackgroundCourse,
+            educationalBackgroundNameOfInstitution: user.educationalBackgroundNameOfInstitution,
+            socialLinkFacebook: user.socialLinkFacebook,
+            socialLinkLinkedIn: user.socialLinkLinkedIn,
+            socialLinkOther: user.socialLinkOther,
+            employmentJobTitle: user.employmentJobTitle,
+            employmentDepartment: user.employmentDepartment,
+            employmentDateOfJoining: user.employmentDateOfJoining ? new Date(user.employmentDateOfJoining) : undefined,
+            employmentEmployeeId: user.employmentEmployeeId,
         };
         return admin;
     }));
@@ -66,32 +111,48 @@ const updateUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
         // Hash the password if it needs to be updated
         const hashedPassword = user.password
             ? crypto_1.default.createHash('sha256').update(user.password).digest('hex')
-            : existingUser.password;
+            : undefined;
         // Update the user details
         yield tx.user.update({
             where: { id: user.id },
             data: {
-                firstname: user.firstname,
-                lastname: user.lastname,
                 email: user.email,
-                password: hashedPassword,
-                phone: (_b = user.phone) !== null && _b !== void 0 ? _b : "",
+                password: user.password ? hashedPassword : undefined,
             },
         });
         // Update the admin details if the user is an admin
-        yield tx.admin.updateMany({
+        yield tx.profile.updateMany({
             where: { userId: user.id },
             data: {
-                roleId: user.userType,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                phone: (_b = user.phone) !== null && _b !== void 0 ? _b : "",
+                roleId: user.role,
                 branchId: user.branchId,
+                gender: user.gender,
+                nationality: user.nationality,
+                passportNumber: user.passportNumber,
+                passportExpiryDate: user.passportExpiryDate ? new Date(user.passportExpiryDate) : undefined,
+                nationalIdNumber: user.nationalIdNumber,
+                educationalBackgroundFieldOfStudy: user.educationalBackgroundFieldOfStudy,
+                educationalBackgroundLevelOfEduction: user.educationalBackgroundLevelOfEduction,
+                educationalBackgroundYearOfGraduation: user.educationalBackgroundYearOfGraduation,
+                educationalBackgroundCourse: user.educationalBackgroundCourse,
+                educationalBackgroundNameOfInstitution: user.educationalBackgroundNameOfInstitution,
+                socialLinkFacebook: user.socialLinkFacebook,
+                socialLinkLinkedIn: user.socialLinkLinkedIn,
+                socialLinkOther: user.socialLinkOther,
+                employmentJobTitle: user.employmentJobTitle,
+                employmentDepartment: user.employmentDepartment,
+                employmentDateOfJoining: user.employmentDateOfJoining ? new Date(user.employmentDateOfJoining) : undefined,
+                employmentEmployeeId: user.employmentEmployeeId,
             },
         });
     }));
 });
 exports.updateUser = updateUser;
 const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const u = yield prisma_1.prisma.admin.findUnique({
+    const u = yield prisma_1.prisma.profile.findUnique({
         where: {
             userId: id,
         },
@@ -103,20 +164,13 @@ const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (u == null) {
         return null;
     }
-    return {
-        id: u.user.id,
-        firstname: u.user.firstname,
-        lastname: u.user.lastname,
-        dob: (_c = u.user.dob) !== null && _c !== void 0 ? _c : undefined,
-        phone: u.user.phone,
-        email: u.user.email,
-        role: u.role.id,
-    };
+    const { user, role } = u, rest = __rest(u, ["user", "role"]);
+    return Object.assign(Object.assign({}, rest), { role: role.id, email: user.email });
 });
 exports.getUser = getUser;
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        yield tx.admin.delete({
+        yield tx.profile.delete({
             where: {
                 userId: id,
             },
@@ -130,7 +184,7 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.deleteUser = deleteUser;
 const getAllUsers = (branchId) => __awaiter(void 0, void 0, void 0, function* () {
-    const admins = yield prisma_1.prisma.admin.findMany({
+    const admins = yield prisma_1.prisma.profile.findMany({
         where: {
             branchId: branchId,
         },
@@ -143,10 +197,10 @@ const getAllUsers = (branchId) => __awaiter(void 0, void 0, void 0, function* ()
         var _a;
         return ({
             id: u.user.id,
-            firstname: u.user.firstname,
-            lastname: u.user.lastname,
-            dob: (_a = u.user.dob) !== null && _a !== void 0 ? _a : undefined,
-            phone: u.user.phone,
+            firstname: u.firstname,
+            lastname: u.lastname,
+            dob: (_a = u.dob) !== null && _a !== void 0 ? _a : undefined,
+            phone: u.phone,
             email: u.user.email,
             role: u.role.id,
         });

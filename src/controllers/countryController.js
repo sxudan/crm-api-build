@@ -11,22 +11,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateCountry = exports.getCountries = exports.deleteCountry = exports.addCountry = void 0;
 const prisma_1 = require("../prisma");
-const addCountry = (countryName) => __awaiter(void 0, void 0, void 0, function* () {
+const addCountry = (countryName, description) => __awaiter(void 0, void 0, void 0, function* () {
     const country = yield prisma_1.prisma.country.create({
         data: {
             name: countryName,
+            description: description
         },
     });
     return country;
 });
 exports.addCountry = addCountry;
-const updateCountry = (id, countryName) => __awaiter(void 0, void 0, void 0, function* () {
+const updateCountry = (id, countryName, description) => __awaiter(void 0, void 0, void 0, function* () {
     const country = yield prisma_1.prisma.country.update({
         where: {
             id: id
         },
         data: {
             name: countryName,
+            description: description
         },
     });
     return country;

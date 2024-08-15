@@ -44,7 +44,7 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
                 dob: new Date(input.dob),
                 isDirect: input.isDirect,
                 subAgentId: input.subagentId,
-                universityAddress: input.universityAddress,
+                universityLongAddressId: input.universityLongAddressId,
                 intake: input.intake,
                 year: input.year,
                 converted: converted,
@@ -53,7 +53,7 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
     }));
 });
 exports.addApplicant = addApplicant;
-const searchApplicants = (query, applicationStatusIds, isDirect, intake, year, country, institution, course) => __awaiter(void 0, void 0, void 0, function* () {
+const searchApplicants = (query, applicationStatusIds, isDirect, intake, years, country, institution, course, intakes) => __awaiter(void 0, void 0, void 0, function* () {
     const applicants = yield prisma_1.prisma.application.findMany({
         where: {
             OR: [
@@ -70,10 +70,11 @@ const searchApplicants = (query, applicationStatusIds, isDirect, intake, year, c
                 },
                 { isDirect: { equals: isDirect } },
                 { intake: { equals: intake } },
-                { year: { equals: year } },
+                { year: { in: years } },
                 { countryId: { equals: country } },
                 { universityId: { equals: institution } },
                 { courseId: { equals: course } },
+                { intake: { in: intakes } }
             ],
         },
         include: {
@@ -82,6 +83,7 @@ const searchApplicants = (query, applicationStatusIds, isDirect, intake, year, c
             university: true,
             visaStatus: true,
             subAgent: true,
+            universityLongAddress: true,
         },
     });
     return applicants;
@@ -123,7 +125,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                     year: input.year,
                     courseId: input.courseId,
                     universityId: input.universityId,
-                    universityAddress: input.universityAddress,
+                    universityLongAddressId: input.universityLongAddressId,
                     leadId: input.leadId,
                     isDirect: (_c = input.isDirect) !== null && _c !== void 0 ? _c : true,
                     referer: input.referer,
@@ -196,7 +198,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                 referer: input.referer,
                 isDirect: input.isDirect,
                 subAgentId: input.subagentId,
-                universityAddress: input.universityAddress,
+                universityLongAddressId: input.universityLongAddressId,
                 year: input.year,
             },
         });
@@ -214,6 +216,7 @@ const getApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
             university: true,
             visaStatus: true,
             subAgent: true,
+            universityLongAddress: true,
         },
     });
 });
@@ -227,6 +230,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 university: true,
                 visaStatus: true,
                 subAgent: true,
+                universityLongAddress: true
             },
             orderBy: {
                 updatedAt: "desc",
@@ -252,6 +256,14 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
         courseId: undefined,
         universityId: undefined,
         universityAddress: undefined,
+        universityLongAddressId: undefined,
+        universityLongAddress: {
+            street1: undefined,
+            street2: undefined,
+            city: undefined,
+            postalcode: undefined,
+            state: undefined
+        },
         leadId: c.id,
         visaStatusId: undefined,
         archived: c.archived,

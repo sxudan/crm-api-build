@@ -42,6 +42,16 @@ exports.languageRoutes.get("/", (req, res, next) => __awaiter(void 0, void 0, vo
         next(e);
     }
 }));
+exports.languageRoutes.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield (0, ieltspteController_1.getLanguageLeadById)(parseInt(id));
+        res.status(200).send({ success: true, data: result });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
 exports.languageRoutes.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;

@@ -6,6 +6,7 @@ const errorHandler = (error, req, res, next) => {
     const status = error.status || 500;
     const code = error.code || exception_1.ErrorCode.UNKNOWN;
     const message = error.message || "Something went wrong.";
+    console.log(error);
     return res.status(status).json({
         status: false,
         error: {

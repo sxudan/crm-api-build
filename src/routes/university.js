@@ -15,8 +15,8 @@ const universityController_1 = require("../controllers/universityController");
 exports.universityRoutes = (0, express_1.Router)();
 exports.universityRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, countryId, addresses, isDirect } = req.body;
-        yield (0, universityController_1.addUniversity)(name, parseInt(countryId), addresses, isDirect);
+        const body = req.body;
+        yield (0, universityController_1.addUniversity)(body);
         res.status(200).send({ success: true });
     }
     catch (e) {
@@ -25,8 +25,8 @@ exports.universityRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0,
 }));
 exports.universityRoutes.put("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, name, countryId, addresses, isDirect } = req.body;
-        yield (0, universityController_1.updateUniversity)(id, name, parseInt(countryId), addresses, isDirect);
+        const body = req.body;
+        yield (0, universityController_1.updateUniversity)(body);
         res.status(200).send({ success: true });
     }
     catch (e) {

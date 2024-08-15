@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.routes = exports.router = void 0;
 const express_1 = require("express");
@@ -17,6 +20,7 @@ const application_1 = require("./application");
 // import { intakeRoutes } from "./intake";
 const visaStatus_1 = require("./visaStatus");
 const subAgent_1 = require("./subAgent");
+const auth_2 = __importDefault(require("../middlewares/auth"));
 const featureMap = {
     "/country": featurelists_1.Features.Countries,
     "/university": featurelists_1.Features.Universities,
@@ -47,7 +51,7 @@ exports.router.use("/language", featureName, language_1.languageRoutes);
 exports.router.use("/user", featureName, users_1.userRoutes);
 exports.router.use("/task", featureName, task_1.taskRoutes);
 exports.router.use("/configuration", configuration_1.configRoutes);
-exports.router.use("/application", featureName, application_1.applicationRoutes);
+exports.router.use("/application", featureName, auth_2.default, application_1.applicationRoutes);
 // router.use("/intake", featureName, intakeRoutes);
 exports.router.use("/visastatus", featureName, visaStatus_1.visaStatusRoutes);
 exports.router.use("/subagent", featureName, subAgent_1.subAgentRouter);
