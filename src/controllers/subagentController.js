@@ -20,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateSubagent = exports.getSubagents = exports.deleteSubAgent = exports.addSubagent = void 0;
+exports.getSubagent = exports.updateSubagent = exports.getSubagents = exports.deleteSubAgent = exports.addSubagent = void 0;
 const prisma_1 = require("../prisma");
 const addSubagent = (agent) => __awaiter(void 0, void 0, void 0, function* () {
     const { agreementStartDate, agreementEndDate } = agent, rest = __rest(agent, ["agreementStartDate", "agreementEndDate"]);
@@ -46,6 +46,15 @@ const getSubagents = () => __awaiter(void 0, void 0, void 0, function* () {
     return res;
 });
 exports.getSubagents = getSubagents;
+const getSubagent = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield prisma_1.prisma.subAgent.findUnique({
+        where: {
+            id: id
+        }
+    });
+    return res;
+});
+exports.getSubagent = getSubagent;
 const deleteSubAgent = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.subAgent.delete({
         where: {

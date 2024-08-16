@@ -57,3 +57,13 @@ exports.subAgentRouter.get("/", (req, res, next) => __awaiter(void 0, void 0, vo
         next(e);
     }
 }));
+exports.subAgentRouter.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const rs = yield (0, subagentController_1.getSubagent)(parseInt(id));
+        res.status(200).send({ success: true, data: rs });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
