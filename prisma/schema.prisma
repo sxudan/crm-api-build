@@ -84,7 +84,6 @@ model Currency {
   symbol  String
   code  String @unique
 
-  bookings  Booking[]
   courses Course[]
 }
 model Course {
@@ -383,7 +382,7 @@ model Lead {
 model LanguageType {
   id            Int            @id @default(autoincrement())
   name          String
-  languageLeads LanguageLead[]
+  // languageLeads LanguageLead[]
 }
 
 model LanguageAdmissionType {
@@ -411,13 +410,12 @@ enum BookingStatus {
 
 model Booking {
   id               Int                   @id @default(autoincrement())
-  name  String
+  // courseName  String
   bookedDate  DateTime
   paymentStatus PaymentStatus
   paymentMode PaymentMode
   venue String
   currencyCode  String
-  currency  Currency @relation(fields: [currencyCode], references: [code])
   amount  Float
   receivedBy  String
   status  BookingStatus
@@ -434,7 +432,7 @@ model Booking {
 
 model ClassBooking {
   id               Int                   @id @default(autoincrement())
-  name  String
+  // courseName  String
   commencementDate  DateTime?
   paymentStatus PaymentStatus
   shift String?
@@ -452,8 +450,8 @@ model LanguageLead {
   id               Int                   @id @default(autoincrement())
   lead             Lead                  @relation(fields: [leadId], references: [id])
   leadId           Int                   @unique
-  languageType     LanguageType          @relation(fields: [languageTypeId], references: [id])
-  languageTypeId   Int
+  // languageType     LanguageType?          @relation(fields: [languageTypeId], references: [id])
+  // languageTypeId   Int?
   admissionType    LanguageAdmissionType @relation(fields: [addmissionTypeId], references: [id])
   addmissionTypeId Int
   enrollmentDate  DateTime?
@@ -526,6 +524,18 @@ model SubAgent {
   name         String
   email        String
   phone        String?
-  address      String?
+  secondaryName         String?
+  secondaryEmail        String?
+  secondaryPhone        String?
+  jobTitle  String?
+  commission  Int?
+  comments  String?
+  agreementStartDate  DateTime?
+  agreementEndDate  DateTime?
+  agreementDetails  String?
+  companyName String?
+  companyAddress      String?
+  companyEmail      String?
+  companyPhone      String?
   applications Application[]
 }

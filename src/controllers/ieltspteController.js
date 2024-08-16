@@ -13,9 +13,10 @@ exports.getLanguageLeadById = exports.updateLanguageLead = exports.deleteLanguag
 const client_1 = require("@prisma/client");
 const prisma_1 = require("../prisma");
 const leadController_1 = require("./leadController");
+const types_1 = require("../models/types");
 const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         const lead = yield tx.lead.create({
             data: {
                 firstname: input.firstname,
@@ -25,29 +26,67 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
                 countryId: input.countryId,
                 description: input.description,
                 priority: input.priority,
+                courseName: (_a = input.courseName) !== null && _a !== void 0 ? _a : "",
+                // booking
             },
         });
-        const classBooking = yield tx.classBooking.create({
-            data: {
-                name: (_a = input.className) !== null && _a !== void 0 ? _a : "",
-                shift: input.shift,
-                commencementDate: input.commencementDate
-                    ? new Date(input.commencementDate)
-                    : undefined,
-                paymentStatus: (_b = input.paymentStatus) !== null && _b !== void 0 ? _b : client_1.PaymentStatus.UnPaid,
-                currencyCode: (_c = input.currencyCode) !== null && _c !== void 0 ? _c : "NPR",
-                amount: (_d = input.amount) !== null && _d !== void 0 ? _d : 0,
-                receivedBy: (_e = input.receivedBy) !== null && _e !== void 0 ? _e : "NPR",
-                instructorId: input.instructorId,
-                comments: (_f = input.comments) !== null && _f !== void 0 ? _f : "",
-            },
-        });
+        let bookingId = null;
+        let classBookingId = null;
+        if (input.admissionTypeId === types_1.AdmissionTypes.Booking) {
+            if (input.courseName && input.bookedDate && input.paymentMode && input.venue && input.bookingStatus) {
+                const booking = yield tx.booking.create({
+                    data: {
+                        bookedDate: input.bookedDate ? new Date(input.bookedDate) : '',
+                        paymentMode: input.paymentMode,
+                        venue: input.venue,
+                        status: input.bookingStatus,
+                        comments: (_b = input.bookingComments) !== null && _b !== void 0 ? _b : '',
+                        amount: (_c = input.amount) !== null && _c !== void 0 ? _c : 0,
+                        receivedBy: (_d = input.receivedBy) !== null && _d !== void 0 ? _d : '',
+                        currencyCode: (_e = input.currencyCode) !== null && _e !== void 0 ? _e : 'NPR',
+                        paymentStatus: (_f = input.paymentStatus) !== null && _f !== void 0 ? _f : client_1.PaymentStatus.UnPaid
+                    }
+                });
+                bookingId = booking.id;
+            }
+            else {
+                throw new Error('Invalid parameter');
+            }
+        }
+        else if (input.admissionTypeId === types_1.AdmissionTypes.Class) {
+            if (input.courseName && input.shift && input.paymentStatus && input.commencementDate) {
+                const classBooking = yield tx.classBooking.create({
+                    data: {
+                        shift: input.shift,
+                        commencementDate: input.commencementDate
+                            ? new Date(input.commencementDate)
+                            : undefined,
+                        paymentStatus: (_g = input.paymentStatus) !== null && _g !== void 0 ? _g : client_1.PaymentStatus.UnPaid,
+                        currencyCode: (_h = input.currencyCode) !== null && _h !== void 0 ? _h : "NPR",
+                        amount: (_j = input.amount) !== null && _j !== void 0 ? _j : 0,
+                        receivedBy: (_k = input.receivedBy) !== null && _k !== void 0 ? _k : "NPR",
+                        instructorId: input.instructorId,
+                        comments: (_l = input.comments) !== null && _l !== void 0 ? _l : "",
+                    },
+                });
+                classBookingId = classBooking.id;
+            }
+            else {
+                console.log(input);
+                throw new Error('Invalid parameters');
+            }
+        }
+        else {
+            classBookingId = null;
+            bookingId = null;
+        }
         yield tx.languageLead.create({
             data: {
                 leadId: lead.id,
-                languageTypeId: input.languageTypeId,
+                // languageTypeId: input.languageTypeId,
                 addmissionTypeId: input.admissionTypeId,
-                classBookingId: classBooking.id,
+                classBookingId: classBookingId,
+                bookingId: bookingId
             },
         });
     }));
@@ -55,25 +94,53 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
 exports.addLanguageLead = addLanguageLead;
 const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _g, _h, _j;
+        var _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3;
         // Fetch the existing lead to ensure it exists
         const existingLead = yield tx.lead.findUnique({
             where: { id: input.id },
+            include: {
+                languageLead: {
+                    include: {
+                        classBooking: true,
+                        booking: true
+                    }
+                }
+            }
         });
         if (!existingLead) {
             throw new Error(`Lead with id ${input.id} does not exist.`);
         }
+        // if (input.classBookingId && input.bookingId) {
+        //   throw new Error ('Class and Booking cannot exist together')
+        // }
+        // if (!input.classBookingId && !input.bookingId) {
+        //   throw new Error('Empty class and booking id')
+        // }
         if (input.toTransfer) {
             yield addLanguageLead({
                 firstname: input.firstname,
                 lastname: input.lastname,
-                email: (_g = input.email) !== null && _g !== void 0 ? _g : "",
-                phone: (_h = input.phone) !== null && _h !== void 0 ? _h : "",
+                email: (_m = input.email) !== null && _m !== void 0 ? _m : "",
+                phone: (_o = input.phone) !== null && _o !== void 0 ? _o : "",
                 countryId: input.countryId,
                 languageTypeId: input.languageTypeId,
                 admissionTypeId: input.admissionTypeId,
                 priority: input.priority,
-                description: (_j = input.description) !== null && _j !== void 0 ? _j : "",
+                description: (_p = input.description) !== null && _p !== void 0 ? _p : "",
+                courseName: input.courseName,
+                commencementDate: input.commencementDate,
+                paymentStatus: input.paymentStatus,
+                shift: input.shift,
+                currencyCode: input.currencyCode,
+                amount: input.amount,
+                receivedBy: input.receivedBy,
+                instructorId: input.instructorId,
+                comments: input.comments,
+                bookedDate: input.bookedDate,
+                paymentMode: input.paymentMode,
+                venue: input.venue,
+                bookingStatus: input.bookingStatus,
+                bookingComments: input.bookingComments,
             });
             yield tx.lead.update({
                 where: {
@@ -99,33 +166,80 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                 priority: input.priority,
                 archived: input.convert,
                 toConvert: input.convert,
+                courseName: input.courseName,
             },
         });
-        const classBooking = yield tx.classBooking.update({
-            where: {
-                id: input.bookingId,
-            },
-            data: {
-                name: input.className,
-                shift: input.shift,
-                commencementDate: input.commencementDate
-                    ? new Date(input.commencementDate)
-                    : undefined,
-                paymentStatus: input.paymentStatus,
-                currencyCode: input.currencyCode,
-                amount: input.amount,
-                receivedBy: input.receivedBy,
-                instructorId: input.instructorId,
-                comments: input.comments,
-            },
-        });
+        if ((_q = existingLead.languageLead) === null || _q === void 0 ? void 0 : _q.classBookingId) {
+            yield tx.classBooking.delete({
+                where: {
+                    id: (_r = existingLead.languageLead) === null || _r === void 0 ? void 0 : _r.classBookingId
+                }
+            });
+        }
+        if ((_s = existingLead.languageLead) === null || _s === void 0 ? void 0 : _s.bookingId) {
+            yield tx.booking.delete({
+                where: {
+                    id: (_t = existingLead.languageLead) === null || _t === void 0 ? void 0 : _t.bookingId
+                }
+            });
+        }
+        let bookingId = null;
+        let classBookingId = null;
+        if (input.admissionTypeId === types_1.AdmissionTypes.Booking) {
+            if (input.courseName && input.bookedDate && input.paymentMode && input.venue && input.bookingStatus) {
+                const booking = yield tx.booking.create({
+                    data: {
+                        bookedDate: input.bookedDate ? new Date(input.bookedDate) : '',
+                        paymentMode: input.paymentMode,
+                        venue: input.venue,
+                        status: input.bookingStatus,
+                        comments: (_u = input.bookingComments) !== null && _u !== void 0 ? _u : '',
+                        amount: (_v = input.amount) !== null && _v !== void 0 ? _v : 0,
+                        receivedBy: (_w = input.receivedBy) !== null && _w !== void 0 ? _w : '',
+                        currencyCode: (_x = input.currencyCode) !== null && _x !== void 0 ? _x : 'NPR',
+                        paymentStatus: (_y = input.paymentStatus) !== null && _y !== void 0 ? _y : client_1.PaymentStatus.UnPaid
+                    }
+                });
+                bookingId = booking.id;
+            }
+            else {
+                throw new Error('Invalid parameter');
+            }
+        }
+        else if (input.admissionTypeId === types_1.AdmissionTypes.Class) {
+            if (input.courseName && input.shift && input.paymentStatus && input.commencementDate) {
+                const classBooking = yield tx.classBooking.create({
+                    data: {
+                        shift: input.shift,
+                        commencementDate: input.commencementDate
+                            ? new Date(input.commencementDate)
+                            : undefined,
+                        paymentStatus: (_z = input.paymentStatus) !== null && _z !== void 0 ? _z : client_1.PaymentStatus.UnPaid,
+                        currencyCode: (_0 = input.currencyCode) !== null && _0 !== void 0 ? _0 : "NPR",
+                        amount: (_1 = input.amount) !== null && _1 !== void 0 ? _1 : 0,
+                        receivedBy: (_2 = input.receivedBy) !== null && _2 !== void 0 ? _2 : "NPR",
+                        instructorId: input.instructorId,
+                        comments: (_3 = input.comments) !== null && _3 !== void 0 ? _3 : "",
+                    },
+                });
+                classBookingId = classBooking.id;
+            }
+            else {
+                throw new Error('Invalid parameters');
+            }
+        }
+        else {
+            classBookingId = null;
+            bookingId = null;
+        }
         // Update the associated language lead details
         yield tx.languageLead.updateMany({
             where: { leadId: input.id },
             data: {
-                languageTypeId: input.languageTypeId,
+                // languageTypeId: input.languageTypeId,
                 addmissionTypeId: input.admissionTypeId,
-                classBookingId: classBooking.id,
+                classBookingId: classBookingId,
+                bookingId: bookingId
             },
         });
     }));
@@ -145,9 +259,10 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
                 languageLead: {
                     select: {
                         id: true,
-                        languageType: true,
+                        // languageType: true,
                         admissionType: true,
                         classBooking: true,
+                        booking: true,
                     },
                 },
             },
@@ -157,7 +272,9 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
         });
         return leads.map((x) => {
             var _a, _b, _c, _d;
-            return (Object.assign(Object.assign({}, x), { languageLeadId: (_a = x.languageLead) === null || _a === void 0 ? void 0 : _a.id, languageType: (_b = x.languageLead) === null || _b === void 0 ? void 0 : _b.languageType, admissionType: (_c = x.languageLead) === null || _c === void 0 ? void 0 : _c.admissionType, classBooking: (_d = x.languageLead) === null || _d === void 0 ? void 0 : _d.classBooking, languageLead: undefined }));
+            return (Object.assign(Object.assign({}, x), { languageLeadId: (_a = x.languageLead) === null || _a === void 0 ? void 0 : _a.id, 
+                // languageType: x.languageLead?.languageType,
+                admissionType: (_b = x.languageLead) === null || _b === void 0 ? void 0 : _b.admissionType, classBooking: (_c = x.languageLead) === null || _c === void 0 ? void 0 : _c.classBooking, booking: (_d = x.languageLead) === null || _d === void 0 ? void 0 : _d.booking, languageLead: undefined }));
         });
     }));
     const _drafts = yield (0, leadController_1.getTransferredLead)();
@@ -210,7 +327,7 @@ const deleteLanguageLeads = (id) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.deleteLanguageLeads = deleteLanguageLeads;
 const getLanguageLeadById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    var _k, _l, _m, _o;
+    var _4, _5, _6, _7;
     const lead = yield prisma_1.prisma.lead.findUnique({
         where: {
             languageLead: {
@@ -224,9 +341,10 @@ const getLanguageLeadById = (id) => __awaiter(void 0, void 0, void 0, function* 
             languageLead: {
                 select: {
                     id: true,
-                    languageType: true,
+                    // languageType: true,
                     admissionType: true,
                     classBooking: true,
+                    booking: true
                 },
             },
         },
@@ -234,6 +352,8 @@ const getLanguageLeadById = (id) => __awaiter(void 0, void 0, void 0, function* 
     if (!lead) {
         return null;
     }
-    return Object.assign(Object.assign({}, lead), { languageLeadId: (_k = lead.languageLead) === null || _k === void 0 ? void 0 : _k.id, languageType: (_l = lead.languageLead) === null || _l === void 0 ? void 0 : _l.languageType, admissionType: (_m = lead.languageLead) === null || _m === void 0 ? void 0 : _m.admissionType, classBooking: (_o = lead.languageLead) === null || _o === void 0 ? void 0 : _o.classBooking, languageLead: undefined });
+    return Object.assign(Object.assign({}, lead), { languageLeadId: (_4 = lead.languageLead) === null || _4 === void 0 ? void 0 : _4.id, 
+        // languageType: lead.languageLead?.languageType,
+        admissionType: (_5 = lead.languageLead) === null || _5 === void 0 ? void 0 : _5.admissionType, classBooking: (_6 = lead.languageLead) === null || _6 === void 0 ? void 0 : _6.classBooking, booking: (_7 = lead.languageLead) === null || _7 === void 0 ? void 0 : _7.booking, languageLead: undefined });
 });
 exports.getLanguageLeadById = getLanguageLeadById;

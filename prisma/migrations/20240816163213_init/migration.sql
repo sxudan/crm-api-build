@@ -315,7 +315,6 @@ CREATE TABLE "LanguageAdmissionType" (
 -- CreateTable
 CREATE TABLE "Booking" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
     "bookedDate" TIMESTAMP(3) NOT NULL,
     "paymentStatus" "PaymentStatus" NOT NULL,
     "paymentMode" "PaymentMode" NOT NULL,
@@ -332,7 +331,6 @@ CREATE TABLE "Booking" (
 -- CreateTable
 CREATE TABLE "ClassBooking" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
     "commencementDate" TIMESTAMP(3),
     "paymentStatus" "PaymentStatus" NOT NULL,
     "shift" TEXT,
@@ -349,7 +347,6 @@ CREATE TABLE "ClassBooking" (
 CREATE TABLE "LanguageLead" (
     "id" SERIAL NOT NULL,
     "leadId" INTEGER NOT NULL,
-    "languageTypeId" INTEGER NOT NULL,
     "addmissionTypeId" INTEGER NOT NULL,
     "enrollmentDate" TIMESTAMP(3),
     "bookingId" INTEGER,
@@ -409,7 +406,19 @@ CREATE TABLE "SubAgent" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT,
-    "address" TEXT,
+    "secondaryName" TEXT,
+    "secondaryEmail" TEXT,
+    "secondaryPhone" TEXT,
+    "jobTitle" TEXT,
+    "commission" INTEGER,
+    "comments" TEXT,
+    "agreementStartDate" TIMESTAMP(3),
+    "agreementEndDate" TIMESTAMP(3),
+    "agreementDetails" TEXT,
+    "companyName" TEXT,
+    "companyAddress" TEXT,
+    "companyEmail" TEXT,
+    "companyPhone" TEXT,
 
     CONSTRAINT "SubAgent_pkey" PRIMARY KEY ("id")
 );
@@ -511,16 +520,10 @@ ALTER TABLE "Address" ADD CONSTRAINT "Address_universityId_fkey" FOREIGN KEY ("u
 ALTER TABLE "Lead" ADD CONSTRAINT "Lead_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Booking" ADD CONSTRAINT "Booking_currencyCode_fkey" FOREIGN KEY ("currencyCode") REFERENCES "Currency"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "ClassBooking" ADD CONSTRAINT "ClassBooking_instructorId_fkey" FOREIGN KEY ("instructorId") REFERENCES "Profile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LanguageLead" ADD CONSTRAINT "LanguageLead_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LanguageLead" ADD CONSTRAINT "LanguageLead_languageTypeId_fkey" FOREIGN KEY ("languageTypeId") REFERENCES "LanguageType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LanguageLead" ADD CONSTRAINT "LanguageLead_addmissionTypeId_fkey" FOREIGN KEY ("addmissionTypeId") REFERENCES "LanguageAdmissionType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
