@@ -27,7 +27,7 @@ const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             service: input.service,
             dob: input.dob ? new Date(input.dob) : undefined,
             courseLevel: input.courseLevel,
-            // courseName: input.courseName,
+            courseName: input.courseName,
             passportCountry: input.passportCountry,
             graduationYear: input.graduationYear
         },
@@ -63,7 +63,7 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
             service: input.service,
             dob: input.dob ? new Date(input.dob) : undefined,
             courseLevel: input.courseLevel,
-            // courseName: input.courseName,
+            courseName: input.courseName,
             passportCountry: input.passportCountry,
             graduationYear: input.graduationYear
         },
