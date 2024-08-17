@@ -154,7 +154,7 @@ exports.updateUser = updateUser;
 const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const u = yield prisma_1.prisma.profile.findUnique({
         where: {
-            userId: id,
+            id: id,
         },
         include: {
             user: true,
@@ -171,12 +171,14 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         yield tx.profile.delete({
             where: {
-                userId: id,
+                id: id,
             },
         });
-        yield tx.user.delete({
+        yield tx.user.deleteMany({
             where: {
-                id: id,
+                profile: {
+                    id: id
+                }
             },
         });
     }));
@@ -194,7 +196,7 @@ const getAllUsers = (branchId) => __awaiter(void 0, void 0, void 0, function* ()
     return admins.map((u) => {
         var _a;
         return ({
-            id: u.user.id,
+            id: u.id,
             firstname: u.firstname,
             lastname: u.lastname,
             dob: (_a = u.dob) !== null && _a !== void 0 ? _a : undefined,
