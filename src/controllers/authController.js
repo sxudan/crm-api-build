@@ -38,10 +38,9 @@ const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
             user: {
                 email: credential.email,
             },
-            roleId: credential.userType,
+            role: credential.userType,
         },
         include: {
-            role: true,
             user: true,
         },
     });
@@ -56,10 +55,10 @@ const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
             const admin = {
                 id: u.userId,
                 email: user.email,
-                role: u.roleId,
+                role: u.role,
                 branchId: u.branchId,
             };
-            return Object.assign(Object.assign({}, generateTokens(u.userId, u.roleId)), { user: admin });
+            return Object.assign(Object.assign({}, generateTokens(u.userId, u.role)), { user: admin });
         }
         else {
             console.log("incorrect password");
@@ -101,7 +100,7 @@ const signup = (user) => __awaiter(void 0, void 0, void 0, function* () {
                 userId: u.id,
                 dob: user.dob ? new Date(user.dob) : undefined,
                 phone: user.phone,
-                roleId: user.userType,
+                role: user.userType,
                 branchId: constants_1.Branch.KamalPokhari
             }
         });

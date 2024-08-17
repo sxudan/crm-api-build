@@ -10,25 +10,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
 const authController_1 = require("../src/controllers/authController");
-const types_1 = require("../src/models/types");
 const prisma_1 = require("../src/prisma");
 const constants_1 = require("../src/utils/constants");
 const ROLES = ["Superadmin", "Counsellor", "Frontdesk", "Account"];
 const LANGUAGETYPES = ["IELTS", "PTE"];
 const ADMISSIONTYPES = ["Class", "Booking"];
 const Seed = {
-    createRoles: () => __awaiter(void 0, void 0, void 0, function* () {
-        yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-            for (const role of ROLES) {
-                yield tx.role.create({
-                    data: {
-                        name: role,
-                    },
-                });
-            }
-        }));
-    }),
+    // createRoles: async () => {
+    //   await prisma.$transaction(async (tx) => {
+    //     for (const role of ROLES) {
+    //       await tx.role.create({
+    //         data: {
+    //           name: role,
+    //         },
+    //       });
+    //     }
+    //   });
+    // },
     createLanguageTypes: () => __awaiter(void 0, void 0, void 0, function* () {
         try {
             yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
@@ -104,7 +104,7 @@ const Seed = {
             firstname: 'Sudan',
             lastname: 'Suwal',
             branchId: constants_1.Branch.KamalPokhari,
-            userType: types_1.Roles.Superadmin,
+            userType: client_1.Roles.Superadmin,
             email: 'sudosuwal@gmail.com',
             password: 'Password1@'
         });
@@ -118,7 +118,7 @@ const Seed = {
 };
 const migrate = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("migrating....");
-    yield Seed.createRoles();
+    // await Seed.createRoles();
     yield Seed.createLanguageTypes();
     yield Seed.createAdmissionTypes();
     yield Seed.createAddress_Branch();

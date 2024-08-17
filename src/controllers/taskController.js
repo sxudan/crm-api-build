@@ -52,7 +52,7 @@ const getAllTask = () => __awaiter(void 0, void 0, void 0, function* () {
             lastname: t.assignedTo.lastname,
             email: t.assignedTo.user.email,
             phone: t.assignedTo.phone,
-            role: t.assignedTo.roleId,
+            role: t.assignedTo.role,
             branchId: t.assignedTo.branchId,
         },
     }));

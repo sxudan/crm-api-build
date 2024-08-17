@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchConfiguration = exports.Access = void 0;
-const types_1 = require("../models/types");
+const client_1 = require("@prisma/client");
 const featurelists_1 = require("../utils/featurelists");
 var Access;
 (function (Access) {
@@ -42,70 +42,70 @@ const noAccess = {
 const fetchAccessConfiguration = () => {
     return {
         [featurelists_1.Features.Dashboard]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Countries]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Universities]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Courses]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Leads]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Language]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Applicants]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Users]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.Tasks]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.VisaStatus]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         },
         [featurelists_1.Features.SubAgent]: {
-            [types_1.Roles.Superadmin]: allAccess,
-            [types_1.Roles.Counsellor]: readAccessOnly,
-            [types_1.Roles.Frontdesk]: readAccessOnly,
-            [types_1.Roles.Account]: readAccessOnly,
+            [client_1.Roles.Superadmin]: allAccess,
+            [client_1.Roles.Counsellor]: readAccessOnly,
+            [client_1.Roles.Frontdesk]: readAccessOnly,
+            [client_1.Roles.Account]: readAccessOnly,
         }
     };
 };

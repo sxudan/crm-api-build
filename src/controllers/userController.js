@@ -45,7 +45,7 @@ const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 phone: (_a = user.phone) !== null && _a !== void 0 ? _a : "",
-                roleId: user.role,
+                role: user.role,
                 branchId: user.branchId,
                 gender: user.gender,
                 nationality: user.nationality,
@@ -127,7 +127,7 @@ const updateUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 phone: (_b = user.phone) !== null && _b !== void 0 ? _b : "",
-                roleId: user.role,
+                role: user.role,
                 branchId: user.branchId,
                 gender: user.gender,
                 nationality: user.nationality,
@@ -158,14 +158,13 @@ const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
         },
         include: {
             user: true,
-            role: true,
         },
     });
     if (u == null) {
         return null;
     }
     const { user, role } = u, rest = __rest(u, ["user", "role"]);
-    return Object.assign(Object.assign({}, rest), { role: role.id, email: user.email });
+    return Object.assign(Object.assign({}, rest), { role: role, email: user.email });
 });
 exports.getUser = getUser;
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -190,7 +189,6 @@ const getAllUsers = (branchId) => __awaiter(void 0, void 0, void 0, function* ()
         },
         include: {
             user: true,
-            role: true,
         },
     });
     return admins.map((u) => {
@@ -202,7 +200,7 @@ const getAllUsers = (branchId) => __awaiter(void 0, void 0, void 0, function* ()
             dob: (_a = u.dob) !== null && _a !== void 0 ? _a : undefined,
             phone: u.phone,
             email: u.user.email,
-            role: u.role.id,
+            role: u.role,
         });
     });
 });

@@ -204,8 +204,7 @@ model Profile {
   firstname String
   lastname  String
 
-  role      Role     @relation(fields: [roleId], references: [id])
-  roleId    Int
+  role      Roles
   branchId  Int
   branch    Branch   @relation(fields: [branchId], references: [id])
   tasks     Task[]
@@ -291,11 +290,19 @@ model Address {
   courses      AddressCourse[]
 }
 
-model Role {
-  id     Int     @id @default(autoincrement())
-  name   String
-  profiles Profile[]
+enum Roles {
+  Superadmin
+  Counsellor 
+  Frontdesk 
+  Account
+  Tutor
 }
+
+// model Role {
+//   id     Int     @id @default(autoincrement())
+//   name   String
+//   profiles Profile[]
+// }
 
 // model Admin {
 //   userId    Int      @id
