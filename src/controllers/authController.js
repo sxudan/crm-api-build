@@ -53,12 +53,12 @@ const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(hashed);
         if (hashed == user.password) {
             const admin = {
-                id: u.userId,
+                id: u.id,
                 email: user.email,
                 role: u.role,
                 branchId: u.branchId,
             };
-            return Object.assign(Object.assign({}, generateTokens(u.userId, u.role)), { user: admin });
+            return Object.assign(Object.assign({}, generateTokens(u.id, u.role)), { user: admin });
         }
         else {
             console.log("incorrect password");
