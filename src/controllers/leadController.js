@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLeadById = exports.getTransferredLead = exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
+exports.getLeadCount = exports.getLeadById = exports.getTransferredLead = exports.getArchivedLeads = exports.updateLead = exports.deleteLead = exports.getLeads = exports.addLead = void 0;
 const prisma_1 = require("../prisma");
+const time_1 = require("../utils/time");
 const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.lead.create({
         data: {
@@ -153,3 +154,19 @@ const deleteLead = (id) => __awaiter(void 0, void 0, void 0, function* () {
     }));
 });
 exports.deleteLead = deleteLead;
+const getLeadCount = (date) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!date) {
+        // If no date is provided, return the count of all leads
+        return yield prisma_1.prisma.lead.count();
+    }
+    const { startOfMonth, endOfMonth } = (0, time_1.getStartAndEnd)(date);
+    return yield prisma_1.prisma.lead.count({
+        where: {
+            createdAt: {
+                gte: startOfMonth,
+                lte: endOfMonth,
+            },
+        },
+    });
+});
+exports.getLeadCount = getLeadCount;

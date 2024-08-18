@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getApplicant = exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
+exports.getApplicationCount = exports.getApplicant = exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
 const prisma_1 = require("../prisma");
+const time_1 = require("../utils/time");
 const leadController_1 = require("./leadController");
 const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
@@ -315,3 +316,27 @@ const deleteApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
     }));
 });
 exports.deleteApplicant = deleteApplicant;
+const getApplicationCount = (date, visaStatusIds) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!date) {
+        // If no date is provided, return the count of all leads
+        return yield prisma_1.prisma.application.count({
+            where: Object.assign({}, (visaStatusIds && visaStatusIds.length > 0 && {
+                OR: visaStatusIds.map((id) => ({
+                    visaStatusId: id,
+                })),
+            }))
+        });
+    }
+    const { startOfMonth, endOfMonth } = (0, time_1.getStartAndEnd)(date);
+    return yield prisma_1.prisma.application.count({
+        where: Object.assign({ createdAt: {
+                gte: startOfMonth,
+                lte: endOfMonth,
+            } }, (visaStatusIds && visaStatusIds.length > 0 && {
+            OR: visaStatusIds.map((id) => ({
+                visaStatusId: id,
+            })),
+        })),
+    });
+});
+exports.getApplicationCount = getApplicationCount;
