@@ -9,21 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getApplicationCount = exports.getApplicant = exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
+exports.updateProfileImage = exports.getApplicationCount = exports.getApplicant = exports.searchApplicants = exports.updateApplicantStatus = exports.updateApplicant = exports.deleteApplicant = exports.getApplicants = exports.addApplicant = void 0;
 const prisma_1 = require("../prisma");
 const time_1 = require("../utils/time");
 const leadController_1 = require("./leadController");
 const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         if (input.assignedTo && input.followUpDate) {
             yield tx.task.create({
                 data: {
                     name: `Follow up ${input.firstname} ${input.lastname}`,
                     description: "",
                     assignedToId: input.assignedTo,
-                    dueDate: input.followUpDate
-                        ? new Date(input.followUpDate * 1000)
-                        : null,
+                    dueDate: input.followUpDate ? input.followUpDate : null,
                 },
             });
         }
@@ -49,11 +48,40 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
                 intake: input.intake,
                 year: input.year,
                 converted: converted,
+                followUpDate: (_a = input.followUpDate) !== null && _a !== void 0 ? _a : null,
+                maritalStatus: input.maritalStatus,
+                spouseFullName: input.spouseFullName,
+                spouseDob: input.spouseDob,
+                spouseHighestEducationLevel: input.spouseHighestEducationLevel,
+                accompanying: input.accompanying,
+                previousHighestEducationLevel: input.previousHighestEducationLevel,
+                previousCourseName: input.previousCourseName,
+                previousYearOfGraduation: input.previousYearOfGraduation,
+                previousOverallScore: input.previousOverallScore,
+                previousLanguageTestType: input.previousLanguageOtherTestType,
+                previousLanguageOtherTestType: input.previousLanguageOtherTestType,
+                previousLanguageScore: input.previousLanguageScore,
+                emergencyContactName: input.emergencyContactName,
+                emergencyContactRelation: input.emergencyContactRelation,
+                emergencyContactPhone: input.emergencyContactPhone,
+                emergencyContactEmail: input.emergencyContactEmail,
+                preferredCommunicationMethod: input.preferredCommunicationMethod,
             },
         });
     }));
 });
 exports.addApplicant = addApplicant;
+const updateProfileImage = (applicantId, profileImagePath) => __awaiter(void 0, void 0, void 0, function* () {
+    yield prisma_1.prisma.application.update({
+        where: {
+            id: applicantId
+        },
+        data: {
+            profileImage: profileImagePath
+        }
+    });
+});
+exports.updateProfileImage = updateProfileImage;
 const searchApplicants = (query, applicationStatusIds, isDirect, intake, years, country, institution, course, intakes) => __awaiter(void 0, void 0, void 0, function* () {
     const applicants = yield prisma_1.prisma.application.findMany({
         where: {
@@ -75,7 +103,7 @@ const searchApplicants = (query, applicationStatusIds, isDirect, intake, years, 
                 { countryId: { equals: country } },
                 { universityId: { equals: institution } },
                 { courseId: { equals: course } },
-                { intake: { in: intakes } }
+                { intake: { in: intakes } },
             ],
         },
         include: {
@@ -102,7 +130,7 @@ const updateApplicantStatus = (applicantId, statusId) => __awaiter(void 0, void 
 });
 exports.updateApplicantStatus = updateApplicantStatus;
 const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _b, _c, _d, _e;
     // Fetch the existing lead to ensure it exists
     const existingLead = yield prisma_1.prisma.application.findUnique({
         where: { id: input.id },
@@ -118,20 +146,38 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                     lastname: input.lastname,
                     email: input.email,
                     phone: input.phone,
-                    dob: (_a = input.dob) !== null && _a !== void 0 ? _a : Date.now(),
+                    dob: (_b = input.dob) !== null && _b !== void 0 ? _b : Date.now(),
                     passportCountry: input.passportCountry,
                     countryId: input.countryId,
-                    description: (_b = input.description) !== null && _b !== void 0 ? _b : "",
+                    description: (_c = input.description) !== null && _c !== void 0 ? _c : "",
                     intake: input.intake,
                     year: input.year,
                     courseId: input.courseId,
                     universityId: input.universityId,
                     universityLongAddressId: input.universityLongAddressId,
                     leadId: input.leadId,
-                    isDirect: (_c = input.isDirect) !== null && _c !== void 0 ? _c : true,
+                    isDirect: (_d = input.isDirect) !== null && _d !== void 0 ? _d : true,
                     referer: input.referer,
                     statusId: input.statusId,
                     subagentId: input.subagentId,
+                    followUpDate: (_e = input.followUpDate) !== null && _e !== void 0 ? _e : null,
+                    maritalStatus: input.maritalStatus,
+                    spouseFullName: input.spouseFullName,
+                    spouseDob: input.spouseDob,
+                    spouseHighestEducationLevel: input.spouseHighestEducationLevel,
+                    accompanying: input.accompanying,
+                    previousHighestEducationLevel: input.previousHighestEducationLevel,
+                    previousCourseName: input.previousCourseName,
+                    previousYearOfGraduation: input.previousYearOfGraduation,
+                    previousOverallScore: input.previousOverallScore,
+                    previousLanguageTestType: input.previousLanguageOtherTestType,
+                    previousLanguageOtherTestType: input.previousLanguageOtherTestType,
+                    previousLanguageScore: input.previousLanguageScore,
+                    emergencyContactName: input.emergencyContactName,
+                    emergencyContactRelation: input.emergencyContactRelation,
+                    emergencyContactPhone: input.emergencyContactPhone,
+                    emergencyContactEmail: input.emergencyContactEmail,
+                    preferredCommunicationMethod: input.preferredCommunicationMethod,
                 }, true);
                 prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
                     yield tx.lead.update({
@@ -151,8 +197,8 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
         throw new Error(`Lead with id ${input.id} does not exist.`);
     }
     prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _d;
-        const taskId = (_d = existingLead.task) === null || _d === void 0 ? void 0 : _d.id;
+        var _f, _g;
+        const taskId = (_f = existingLead.task) === null || _f === void 0 ? void 0 : _f.id;
         if (taskId) {
             tx.task.update({
                 where: {
@@ -160,9 +206,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                 },
                 data: {
                     assignedToId: input.assignedTo,
-                    dueDate: input.followUpDate
-                        ? new Date(input.followUpDate * 1000)
-                        : null,
+                    dueDate: input.followUpDate ? input.followUpDate : null,
                 },
             });
         }
@@ -173,9 +217,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                         name: `Follow up ${input.firstname} ${input.lastname}`,
                         description: "",
                         assignedToId: input.assignedTo,
-                        dueDate: input.followUpDate
-                            ? new Date(input.followUpDate * 1000)
-                            : null,
+                        dueDate: input.followUpDate ? input.followUpDate : null,
                     },
                 });
             }
@@ -201,6 +243,24 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                 subAgentId: input.subagentId,
                 universityLongAddressId: input.universityLongAddressId,
                 year: input.year,
+                followUpDate: (_g = input.followUpDate) !== null && _g !== void 0 ? _g : null,
+                maritalStatus: input.maritalStatus,
+                spouseFullName: input.spouseFullName,
+                spouseDob: input.spouseDob,
+                spouseHighestEducationLevel: input.spouseHighestEducationLevel,
+                accompanying: input.accompanying,
+                previousHighestEducationLevel: input.previousHighestEducationLevel,
+                previousCourseName: input.previousCourseName,
+                previousYearOfGraduation: input.previousYearOfGraduation,
+                previousOverallScore: input.previousOverallScore,
+                previousLanguageTestType: input.previousLanguageOtherTestType,
+                previousLanguageOtherTestType: input.previousLanguageOtherTestType,
+                previousLanguageScore: input.previousLanguageScore,
+                emergencyContactName: input.emergencyContactName,
+                emergencyContactRelation: input.emergencyContactRelation,
+                emergencyContactPhone: input.emergencyContactPhone,
+                emergencyContactEmail: input.emergencyContactEmail,
+                preferredCommunicationMethod: input.preferredCommunicationMethod,
             },
         });
     }));
@@ -231,7 +291,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 university: true,
                 visaStatus: true,
                 subAgent: true,
-                universityLongAddress: true
+                universityLongAddress: true,
             },
             orderBy: {
                 updatedAt: "desc",
@@ -263,7 +323,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
             street2: undefined,
             city: undefined,
             postalcode: undefined,
-            state: undefined
+            state: undefined,
         },
         leadId: c.id,
         visaStatusId: undefined,
@@ -320,11 +380,12 @@ const getApplicationCount = (date, visaStatusIds) => __awaiter(void 0, void 0, v
     if (!date) {
         // If no date is provided, return the count of all leads
         return yield prisma_1.prisma.application.count({
-            where: Object.assign({}, (visaStatusIds && visaStatusIds.length > 0 && {
+            where: Object.assign({}, (visaStatusIds &&
+                visaStatusIds.length > 0 && {
                 OR: visaStatusIds.map((id) => ({
                     visaStatusId: id,
                 })),
-            }))
+            })),
         });
     }
     const { startOfMonth, endOfMonth } = (0, time_1.getStartAndEnd)(date);
@@ -332,7 +393,8 @@ const getApplicationCount = (date, visaStatusIds) => __awaiter(void 0, void 0, v
         where: Object.assign({ createdAt: {
                 gte: startOfMonth,
                 lte: endOfMonth,
-            } }, (visaStatusIds && visaStatusIds.length > 0 && {
+            } }, (visaStatusIds &&
+            visaStatusIds.length > 0 && {
             OR: visaStatusIds.map((id) => ({
                 visaStatusId: id,
             })),

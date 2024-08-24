@@ -2,6 +2,9 @@
 CREATE TYPE "Gender" AS ENUM ('Male', 'Female', 'Others');
 
 -- CreateEnum
+CREATE TYPE "Roles" AS ENUM ('Superadmin', 'Counsellor', 'Frontdesk', 'Account', 'Tutor');
+
+-- CreateEnum
 CREATE TYPE "LeadServices" AS ENUM ('TestPreparation', 'TestBooking', 'Counseling', 'Documentation', 'OHSC', 'VirtualCounseling', 'VisitVisa', 'PSW', 'Others');
 
 -- CreateEnum
@@ -34,17 +37,18 @@ CREATE TABLE "Country" (
 );
 
 -- CreateTable
-CREATE TABLE "UniversityScholarshipRequirement" (
+CREATE TABLE "UniversityRequirement" (
     "id" SERIAL NOT NULL,
     "academicRequirement" TEXT,
     "ieltsRequirement" TEXT,
     "pteRequirement" TEXT,
     "toeflRequirement" TEXT,
     "scholarshipRequirement" TEXT,
+    "scholarshipAmount" TEXT,
     "otherRequirement" TEXT,
     "comments" TEXT,
 
-    CONSTRAINT "UniversityScholarshipRequirement_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "UniversityRequirement_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -175,7 +179,7 @@ CREATE TABLE "Profile" (
     "userId" INTEGER NOT NULL,
     "firstname" TEXT NOT NULL,
     "lastname" TEXT NOT NULL,
-    "roleId" INTEGER NOT NULL,
+    "role" "Roles" NOT NULL,
     "branchId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -245,14 +249,6 @@ CREATE TABLE "Address" (
     "universityId" INTEGER,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Role" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-
-    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -405,7 +401,7 @@ CREATE TABLE "SubAgent" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "phone" TEXT,
+    "phone" TEXT NOT NULL,
     "secondaryName" TEXT,
     "secondaryEmail" TEXT,
     "secondaryPhone" TEXT,
@@ -415,10 +411,10 @@ CREATE TABLE "SubAgent" (
     "agreementStartDate" TIMESTAMP(3),
     "agreementEndDate" TIMESTAMP(3),
     "agreementDetails" TEXT,
-    "companyName" TEXT,
-    "companyAddress" TEXT,
-    "companyEmail" TEXT,
-    "companyPhone" TEXT,
+    "companyName" TEXT NOT NULL,
+    "companyAddress" TEXT NOT NULL,
+    "companyEmail" TEXT NOT NULL,
+    "companyPhone" TEXT NOT NULL,
 
     CONSTRAINT "SubAgent_pkey" PRIMARY KEY ("id")
 );
@@ -469,7 +465,7 @@ CREATE UNIQUE INDEX "Application_universityLongAddressId_key" ON "Application"("
 ALTER TABLE "University" ADD CONSTRAINT "University_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "University" ADD CONSTRAINT "University_requirementId_fkey" FOREIGN KEY ("requirementId") REFERENCES "UniversityScholarshipRequirement"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "University" ADD CONSTRAINT "University_requirementId_fkey" FOREIGN KEY ("requirementId") REFERENCES "UniversityRequirement"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Course" ADD CONSTRAINT "Course_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -478,7 +474,7 @@ ALTER TABLE "Course" ADD CONSTRAINT "Course_universityId_fkey" FOREIGN KEY ("uni
 ALTER TABLE "Course" ADD CONSTRAINT "Course_currencyCode_fkey" FOREIGN KEY ("currencyCode") REFERENCES "Currency"("code") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Course" ADD CONSTRAINT "Course_requirementId_fkey" FOREIGN KEY ("requirementId") REFERENCES "UniversityScholarshipRequirement"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Course" ADD CONSTRAINT "Course_requirementId_fkey" FOREIGN KEY ("requirementId") REFERENCES "UniversityRequirement"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AddressCourse" ADD CONSTRAINT "AddressCourse_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -503,9 +499,6 @@ ALTER TABLE "ReferenceProfile" ADD CONSTRAINT "ReferenceProfile_profileId_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Profile" ADD CONSTRAINT "Profile_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES "Branch"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

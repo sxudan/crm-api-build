@@ -10,9 +10,11 @@ const express_1 = __importDefault(require("express"));
 const middlewares_1 = require("./middlewares");
 const error_1 = require("./middlewares/error");
 const routes_1 = require("./routes");
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
 const startServer = () => {
     const app = (0, express_1.default)();
+    app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
     // Apply middleware
     (0, middlewares_1.applyMiddleware)(app);
     app.use((0, cors_1.default)());

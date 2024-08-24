@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  // binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -32,13 +32,14 @@ model Country {
   visaStatusLists VisaStatus[]
 }
 
-model UniversityScholarshipRequirement {
+model UniversityRequirement {
   id                     Int          @id @default(autoincrement())
   academicRequirement    String?
   ieltsRequirement       String?
   pteRequirement         String?
   toeflRequirement       String?
   scholarshipRequirement String?
+  scholarshipAmount String?
   otherRequirement  String?
   comments               String?
   universities           University[]
@@ -56,7 +57,7 @@ model University {
   courses      Course[]
   applications Application[]
   websiteUrl    String?
-  requirement   UniversityScholarshipRequirement? @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  requirement   UniversityRequirement? @relation(fields: [requirementId], references: [id], onDelete: Cascade)
   requirementId Int? @unique
   contactPersonName        String?
   contactPersonJobTitle    String?
@@ -103,7 +104,7 @@ model Course {
   currencyCode  String?
   currency  Currency? @relation(fields: [currencyCode], references: [code])
   requirementId Int?
-  requirement UniversityScholarshipRequirement? @relation(fields: [requirementId], references: [id])
+  requirement UniversityRequirement? @relation(fields: [requirementId], references: [id])
 
   createdAt    DateTime        @default(now()) // Add createdAt field
   updatedAt    DateTime        @updatedAt // Add updatedAt field
@@ -489,6 +490,11 @@ enum Priority {
   Low
 }
 
+enum MaritalStatus {
+  Single
+  Married
+}
+
 model Application {
   id                      Int        @id @default(autoincrement())
   firstname               String
@@ -524,13 +530,37 @@ model Application {
   subAgent     SubAgent?  @relation(fields: [subAgentId], references: [id])
   converted    Boolean    @default(false)
   task         Task?
+
+  maritalStatus MaritalStatus?
+  spouseFullName  String?
+  spouseDob DateTime?
+  spouseHighestEducationLevel String?
+  accompanying  Boolean?
+
+  previousHighestEducationLevel   String?
+  previousCourseName  String?
+  previousYearOfGraduation  Int?
+  previousOverallScore  String?
+
+  previousLanguageTestType  String?
+  previousLanguageOtherTestType String?
+  previousLanguageScore String?
+
+  emergencyContactName  String?
+  emergencyContactRelation String?
+  emergencyContactPhone String?
+  emergencyContactEmail String?
+
+  preferredCommunicationMethod  String?
+  followUpDate  DateTime?
+  profileImage  String?
 }
 
 model SubAgent {
   id           Int           @id @default(autoincrement())
   name         String
   email        String
-  phone        String?
+  phone        String
   secondaryName         String?
   secondaryEmail        String?
   secondaryPhone        String?
@@ -540,9 +570,9 @@ model SubAgent {
   agreementStartDate  DateTime?
   agreementEndDate  DateTime?
   agreementDetails  String?
-  companyName String?
-  companyAddress      String?
-  companyEmail      String?
-  companyPhone      String?
+  companyName String
+  companyAddress      String
+  companyEmail      String
+  companyPhone      String
   applications Application[]
 }

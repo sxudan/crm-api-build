@@ -13,13 +13,14 @@ exports.fetchGetCourseLevels = exports.fetchGetCourseFields = exports.getCourses
 const prisma_1 = require("../prisma");
 const addCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        const requirement = yield tx.universityScholarshipRequirement.create({
+        const requirement = yield tx.universityRequirement.create({
             data: {
                 pteRequirement: input.pteRequirement,
                 ieltsRequirement: input.ieltsRequirement,
                 toeflRequirement: input.toeflRequirement,
                 academicRequirement: input.academicRequirement,
                 scholarshipRequirement: input.scholarshipRequirement,
+                scholarshipAmount: input.scholarshipAmount,
                 comments: input.requirementComments,
                 otherRequirement: input.otherRequirement,
             },
@@ -72,7 +73,7 @@ const updateCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
         if (input.courseName) {
             let requirementId = existingCourse.requirementId;
             if (requirementId) {
-                yield tx.universityScholarshipRequirement.update({
+                yield tx.universityRequirement.update({
                     where: {
                         id: requirementId,
                     },
@@ -83,11 +84,12 @@ const updateCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
                         academicRequirement: input.academicRequirement,
                         scholarshipRequirement: input.scholarshipRequirement,
                         comments: input.requirementComments,
+                        scholarshipAmount: input.scholarshipAmount,
                     },
                 });
             }
             else {
-                const requirement = yield tx.universityScholarshipRequirement.create({
+                const requirement = yield tx.universityRequirement.create({
                     data: {
                         pteRequirement: input.pteRequirement,
                         ieltsRequirement: input.ieltsRequirement,
@@ -96,6 +98,7 @@ const updateCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
                         scholarshipRequirement: input.scholarshipRequirement,
                         comments: input.requirementComments,
                         otherRequirement: input.otherRequirement,
+                        scholarshipAmount: input.scholarshipAmount,
                     },
                 });
                 requirementId = requirement.id;

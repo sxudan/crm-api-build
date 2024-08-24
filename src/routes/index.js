@@ -22,6 +22,7 @@ const visaStatus_1 = require("./visaStatus");
 const subAgent_1 = require("./subAgent");
 const auth_2 = __importDefault(require("../middlewares/auth"));
 const dashboard_1 = require("./dashboard");
+const image_1 = require("./image");
 const featureMap = {
     "/country": featurelists_1.Features.Countries,
     "/university": featurelists_1.Features.Universities,
@@ -34,6 +35,7 @@ const featureMap = {
     "/visastatus": featurelists_1.Features.VisaStatus,
     "/subagent": featurelists_1.Features.SubAgent,
     "/dashboard": featurelists_1.Features.Dashboard,
+    "/image": featurelists_1.Features.Image,
 };
 const featureName = (req, res, next) => {
     const url = req.baseUrl.replace("/api", "");
@@ -58,3 +60,4 @@ exports.router.use("/application", featureName, auth_2.default, application_1.ap
 exports.router.use("/visastatus", featureName, visaStatus_1.visaStatusRoutes);
 exports.router.use("/subagent", featureName, subAgent_1.subAgentRouter);
 exports.router.use("/dashboard", featureName, dashboard_1.dashboardRoutes);
+exports.router.use("/image", featureName, image_1.imageRoutes);

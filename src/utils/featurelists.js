@@ -4,6 +4,7 @@ exports.Features = void 0;
 var Features;
 (function (Features) {
     Features["Dashboard"] = "Dashboard";
+    Features["Image"] = "Image";
     Features["Countries"] = "Countries";
     Features["Universities"] = "Universities";
     Features["Courses"] = "Courses";

@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.applicationRoutes = void 0;
 const express_1 = require("express");
 const applicationController_1 = require("../controllers/applicationController");
+const multer_1 = __importDefault(require("../utils/multer"));
 exports.applicationRoutes = (0, express_1.Router)();
 exports.applicationRoutes.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -57,6 +61,18 @@ exports.applicationRoutes.get("/:id", (req, res, next) => __awaiter(void 0, void
         const { id } = req.params;
         const result = yield (0, applicationController_1.getApplicant)(parseInt(id));
         res.status(200).send({ success: true, data: result });
+    }
+    catch (e) {
+        next(e);
+    }
+}));
+exports.applicationRoutes.post('/uploadImage', multer_1.default.single('profileImage'), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const { applicationId } = req.body;
+        const url = `${process.env.BASE_URL}/image/${(_a = req.file) === null || _a === void 0 ? void 0 : _a.filename}`;
+        yield (0, applicationController_1.updateProfileImage)(parseInt(applicationId), url);
+        res.status(200).json({ success: true, data: url });
     }
     catch (e) {
         next(e);
