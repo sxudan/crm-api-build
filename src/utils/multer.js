@@ -5,11 +5,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 // Define custom storage for multer
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        // Specify the uploads folder
-        cb(null, 'uploads/');
+        // Use a relative path to the current directory
+        const uploadDir = path_1.default.join(process.cwd(), 'uploads');
+        // Ensure the upload directory exists
+        if (!fs_1.default.existsSync(uploadDir)) {
+            fs_1.default.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         // Generate a custom filename
