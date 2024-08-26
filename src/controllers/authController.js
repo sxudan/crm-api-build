@@ -50,7 +50,6 @@ const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
             .createHash("sha256")
             .update(credential.password)
             .digest("hex");
-        console.log(hashed);
         if (hashed == user.password) {
             const admin = {
                 id: u.id,
@@ -62,7 +61,7 @@ const login = (credential) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else {
             console.log("incorrect password");
-            throw new exception_1.AuthException();
+            throw new exception_1.AuthException({ message: 'Email or Password is incorrect' });
         }
     }
     else {

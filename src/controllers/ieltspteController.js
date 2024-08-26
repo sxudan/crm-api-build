@@ -30,6 +30,17 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
                 // booking
             },
         });
+        if (input.assignedTo) {
+            yield tx.task.create({
+                data: {
+                    leadId: lead.id,
+                    name: `Follow up ${input.firstname} ${input.lastname}`,
+                    description: "",
+                    dueDate: input.followUpDate ? input.followUpDate : null,
+                    assignedToId: input.assignedTo,
+                },
+            });
+        }
         let bookingId = null;
         let classBookingId = null;
         if (input.admissionTypeId === types_1.AdmissionTypes.Booking) {
@@ -94,7 +105,7 @@ const addLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* (
 exports.addLanguageLead = addLanguageLead;
 const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3;
+        var _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4;
         // Fetch the existing lead to ensure it exists
         const existingLead = yield tx.lead.findUnique({
             where: { id: input.id },
@@ -102,9 +113,10 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                 languageLead: {
                     include: {
                         classBooking: true,
-                        booking: true
+                        booking: true,
                     }
-                }
+                },
+                task: true
             }
         });
         if (!existingLead) {
@@ -153,6 +165,31 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
             });
             return;
         }
+        const taskId = (_q = existingLead.task) === null || _q === void 0 ? void 0 : _q.id;
+        if (taskId) {
+            yield tx.task.update({
+                where: {
+                    id: taskId,
+                },
+                data: {
+                    assignedToId: input.assignedTo,
+                    dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
+                },
+            });
+        }
+        else {
+            if (input.assignedTo) {
+                yield tx.task.create({
+                    data: {
+                        name: `Follow up ${input.firstname} ${input.lastname}`,
+                        description: "",
+                        assignedToId: input.assignedTo,
+                        dueDate: input.followUpDate ? input.followUpDate : null,
+                        leadId: input.id,
+                    },
+                });
+            }
+        }
         // Update the lead details
         yield tx.lead.update({
             where: { id: input.id },
@@ -169,17 +206,17 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                 courseName: input.courseName,
             },
         });
-        if ((_q = existingLead.languageLead) === null || _q === void 0 ? void 0 : _q.classBookingId) {
+        if ((_r = existingLead.languageLead) === null || _r === void 0 ? void 0 : _r.classBookingId) {
             yield tx.classBooking.delete({
                 where: {
-                    id: (_r = existingLead.languageLead) === null || _r === void 0 ? void 0 : _r.classBookingId
+                    id: (_s = existingLead.languageLead) === null || _s === void 0 ? void 0 : _s.classBookingId
                 }
             });
         }
-        if ((_s = existingLead.languageLead) === null || _s === void 0 ? void 0 : _s.bookingId) {
+        if ((_t = existingLead.languageLead) === null || _t === void 0 ? void 0 : _t.bookingId) {
             yield tx.booking.delete({
                 where: {
-                    id: (_t = existingLead.languageLead) === null || _t === void 0 ? void 0 : _t.bookingId
+                    id: (_u = existingLead.languageLead) === null || _u === void 0 ? void 0 : _u.bookingId
                 }
             });
         }
@@ -193,11 +230,11 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                         paymentMode: input.paymentMode,
                         venue: input.venue,
                         status: input.bookingStatus,
-                        comments: (_u = input.bookingComments) !== null && _u !== void 0 ? _u : '',
-                        amount: (_v = input.amount) !== null && _v !== void 0 ? _v : 0,
-                        receivedBy: (_w = input.receivedBy) !== null && _w !== void 0 ? _w : '',
-                        currencyCode: (_x = input.currencyCode) !== null && _x !== void 0 ? _x : 'NPR',
-                        paymentStatus: (_y = input.paymentStatus) !== null && _y !== void 0 ? _y : client_1.PaymentStatus.UnPaid
+                        comments: (_v = input.bookingComments) !== null && _v !== void 0 ? _v : '',
+                        amount: (_w = input.amount) !== null && _w !== void 0 ? _w : 0,
+                        receivedBy: (_x = input.receivedBy) !== null && _x !== void 0 ? _x : '',
+                        currencyCode: (_y = input.currencyCode) !== null && _y !== void 0 ? _y : 'NPR',
+                        paymentStatus: (_z = input.paymentStatus) !== null && _z !== void 0 ? _z : client_1.PaymentStatus.UnPaid
                     }
                 });
                 bookingId = booking.id;
@@ -214,12 +251,12 @@ const updateLanguageLead = (input) => __awaiter(void 0, void 0, void 0, function
                         commencementDate: input.commencementDate
                             ? new Date(input.commencementDate)
                             : undefined,
-                        paymentStatus: (_z = input.paymentStatus) !== null && _z !== void 0 ? _z : client_1.PaymentStatus.UnPaid,
-                        currencyCode: (_0 = input.currencyCode) !== null && _0 !== void 0 ? _0 : "NPR",
-                        amount: (_1 = input.amount) !== null && _1 !== void 0 ? _1 : 0,
-                        receivedBy: (_2 = input.receivedBy) !== null && _2 !== void 0 ? _2 : "NPR",
+                        paymentStatus: (_0 = input.paymentStatus) !== null && _0 !== void 0 ? _0 : client_1.PaymentStatus.UnPaid,
+                        currencyCode: (_1 = input.currencyCode) !== null && _1 !== void 0 ? _1 : "NPR",
+                        amount: (_2 = input.amount) !== null && _2 !== void 0 ? _2 : 0,
+                        receivedBy: (_3 = input.receivedBy) !== null && _3 !== void 0 ? _3 : "NPR",
                         instructorId: input.instructorId,
-                        comments: (_3 = input.comments) !== null && _3 !== void 0 ? _3 : "",
+                        comments: (_4 = input.comments) !== null && _4 !== void 0 ? _4 : "",
                     },
                 });
                 classBookingId = classBooking.id;
@@ -256,6 +293,7 @@ const getLanguageLeads = () => __awaiter(void 0, void 0, void 0, function* () {
             },
             include: {
                 country: true,
+                task: true,
                 languageLead: {
                     select: {
                         id: true,
@@ -327,7 +365,7 @@ const deleteLanguageLeads = (id) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.deleteLanguageLeads = deleteLanguageLeads;
 const getLanguageLeadById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    var _4, _5, _6, _7;
+    var _5, _6, _7, _8;
     const lead = yield prisma_1.prisma.lead.findUnique({
         where: {
             languageLead: {
@@ -338,6 +376,7 @@ const getLanguageLeadById = (id) => __awaiter(void 0, void 0, void 0, function* 
         },
         include: {
             country: true,
+            task: true,
             languageLead: {
                 select: {
                     id: true,
@@ -352,8 +391,8 @@ const getLanguageLeadById = (id) => __awaiter(void 0, void 0, void 0, function* 
     if (!lead) {
         return null;
     }
-    return Object.assign(Object.assign({}, lead), { languageLeadId: (_4 = lead.languageLead) === null || _4 === void 0 ? void 0 : _4.id, 
+    return Object.assign(Object.assign({}, lead), { languageLeadId: (_5 = lead.languageLead) === null || _5 === void 0 ? void 0 : _5.id, 
         // languageType: lead.languageLead?.languageType,
-        admissionType: (_5 = lead.languageLead) === null || _5 === void 0 ? void 0 : _5.admissionType, classBooking: (_6 = lead.languageLead) === null || _6 === void 0 ? void 0 : _6.classBooking, booking: (_7 = lead.languageLead) === null || _7 === void 0 ? void 0 : _7.booking, languageLead: undefined });
+        admissionType: (_6 = lead.languageLead) === null || _6 === void 0 ? void 0 : _6.admissionType, classBooking: (_7 = lead.languageLead) === null || _7 === void 0 ? void 0 : _7.classBooking, booking: (_8 = lead.languageLead) === null || _8 === void 0 ? void 0 : _8.booking, languageLead: undefined });
 });
 exports.getLanguageLeadById = getLanguageLeadById;

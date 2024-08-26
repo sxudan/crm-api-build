@@ -13,62 +13,106 @@ exports.getLeadCount = exports.getLeadById = exports.getTransferredLead = export
 const prisma_1 = require("../prisma");
 const time_1 = require("../utils/time");
 const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.prisma.lead.create({
-        data: {
-            firstname: input.firstname,
-            lastname: input.lastname,
-            email: input.email,
-            phone: input.phone,
-            countryId: input.countryId,
-            description: input.description,
-            priority: input.priority,
-            converted: false,
-            archived: false,
-            toConvert: false,
-            service: input.service,
-            dob: input.dob ? new Date(input.dob) : undefined,
-            courseLevel: input.courseLevel,
-            courseName: input.courseName,
-            passportCountry: input.passportCountry,
-            graduationYear: input.graduationYear
-        },
-    });
+    yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const lead = yield tx.lead.create({
+            data: {
+                firstname: input.firstname,
+                lastname: input.lastname,
+                email: input.email,
+                phone: input.phone,
+                countryId: input.countryId,
+                description: input.description,
+                priority: input.priority,
+                converted: false,
+                archived: false,
+                toConvert: false,
+                service: input.service,
+                dob: input.dob ? new Date(input.dob) : undefined,
+                courseLevel: input.courseLevel,
+                courseName: input.courseName,
+                passportCountry: input.passportCountry,
+                graduationYear: input.graduationYear,
+            },
+        });
+        if (input.assignedTo) {
+            yield tx.task.create({
+                data: {
+                    leadId: lead.id,
+                    name: `Follow up ${input.firstname} ${input.lastname}`,
+                    description: "",
+                    dueDate: input.followUpDate ? input.followUpDate : null,
+                    assignedToId: input.assignedTo,
+                },
+            });
+        }
+    }));
 });
 exports.addLead = addLead;
 const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
-    // Fetch the existing lead to ensure it exists
-    const existingLead = yield prisma_1.prisma.lead.findUnique({
-        where: { id: input.id },
-    });
-    if (!existingLead) {
-        throw new Error(`Lead with id ${input.id} does not exist.`);
-    }
-    // guard to prevent toConvert and transferToLanguage to be true
-    if (input.convert == true && input.transfer == true) {
-        throw new Error(`A lead can be converted and transferred at a same time`);
-    }
-    // Update the lead details
-    yield prisma_1.prisma.lead.update({
-        where: { id: input.id },
-        data: {
-            firstname: input.firstname,
-            lastname: input.lastname,
-            email: input.email,
-            phone: input.phone,
-            countryId: input.countryId,
-            description: input.description,
-            priority: input.priority,
-            archived: input.convert || input.transfer,
-            toConvert: input.convert,
-            toTransferToLanguage: input.transfer,
-            service: input.service,
-            dob: input.dob ? new Date(input.dob) : undefined,
-            courseLevel: input.courseLevel,
-            courseName: input.courseName,
-            passportCountry: input.passportCountry,
-            graduationYear: input.graduationYear
-        },
-    });
+    yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        // Fetch the existing lead to ensure it exists
+        const existingLead = yield tx.lead.findUnique({
+            where: { id: input.id },
+            include: {
+                task: true,
+            },
+        });
+        if (!existingLead) {
+            throw new Error(`Lead with id ${input.id} does not exist.`);
+        }
+        // guard to prevent toConvert and transferToLanguage to be true
+        if (input.convert == true && input.transfer == true) {
+            throw new Error(`A lead can be converted and transferred at a same time`);
+        }
+        const taskId = (_a = existingLead.task) === null || _a === void 0 ? void 0 : _a.id;
+        if (taskId) {
+            yield tx.task.update({
+                where: {
+                    id: taskId,
+                },
+                data: {
+                    assignedToId: input.assignedTo,
+                    dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
+                },
+            });
+        }
+        else {
+            if (input.assignedTo) {
+                yield tx.task.create({
+                    data: {
+                        name: `Follow up ${input.firstname} ${input.lastname}`,
+                        description: "",
+                        assignedToId: input.assignedTo,
+                        dueDate: input.followUpDate ? input.followUpDate : null,
+                        leadId: input.id,
+                    },
+                });
+            }
+        }
+        // Update the lead details
+        yield prisma_1.prisma.lead.update({
+            where: { id: input.id },
+            data: {
+                firstname: input.firstname,
+                lastname: input.lastname,
+                email: input.email,
+                phone: input.phone,
+                countryId: input.countryId,
+                description: input.description,
+                priority: input.priority,
+                archived: input.convert || input.transfer,
+                toConvert: input.convert,
+                toTransferToLanguage: input.transfer,
+                service: input.service,
+                dob: input.dob ? new Date(input.dob) : undefined,
+                courseLevel: input.courseLevel,
+                courseName: input.courseName,
+                passportCountry: input.passportCountry,
+                graduationYear: input.graduationYear,
+            },
+        });
+    }));
 });
 exports.updateLead = updateLead;
 const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -80,6 +124,7 @@ const getLeads = () => __awaiter(void 0, void 0, void 0, function* () {
             },
             include: {
                 country: true,
+                task: true
             },
             orderBy: {
                 createdAt: "desc",
@@ -95,10 +140,11 @@ const getLeadById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         where: {
             languageLead: null,
             archived: false,
-            id: id
+            id: id,
         },
         include: {
             country: true,
+            task: true
         },
     });
     return lead;
@@ -114,6 +160,7 @@ const getArchivedLeads = () => __awaiter(void 0, void 0, void 0, function* () {
             },
             include: {
                 country: true,
+                task: true
             },
             orderBy: {
                 createdAt: "desc",
@@ -134,6 +181,7 @@ const getTransferredLead = () => __awaiter(void 0, void 0, void 0, function* () 
             },
             include: {
                 country: true,
+                task: true
             },
             orderBy: {
                 createdAt: "desc",
@@ -146,6 +194,11 @@ const getTransferredLead = () => __awaiter(void 0, void 0, void 0, function* () 
 exports.getTransferredLead = getTransferredLead;
 const deleteLead = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        yield tx.task.deleteMany({
+            where: {
+                leadId: id,
+            },
+        });
         yield tx.lead.deleteMany({
             where: {
                 id: id,

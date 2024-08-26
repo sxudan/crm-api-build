@@ -28,6 +28,7 @@ const addCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
         const course = yield tx.course.create({
             data: {
                 name: input.courseName,
+                countryId: input.countryId,
                 universityId: input.universityId,
                 intakes: input.intakes,
                 courseField: input.courseField,
@@ -85,6 +86,7 @@ const updateCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
                         scholarshipRequirement: input.scholarshipRequirement,
                         comments: input.requirementComments,
                         scholarshipAmount: input.scholarshipAmount,
+                        otherRequirement: input.otherRequirement
                     },
                 });
             }
@@ -107,6 +109,7 @@ const updateCourse = (input) => __awaiter(void 0, void 0, void 0, function* () {
                 where: { id: input.id },
                 data: {
                     name: input.courseName,
+                    countryId: input.countryId,
                     universityId: input.universityId,
                     intakes: input.intakes,
                     courseField: input.courseField,
@@ -180,6 +183,7 @@ const getCourses = () => __awaiter(void 0, void 0, void 0, function* () {
             id: true,
             name: true,
             university: true,
+            country: true,
             intakes: true,
             addresses: {
                 select: {
@@ -208,6 +212,7 @@ const getCoursesByUniversity = (universityId) => __awaiter(void 0, void 0, void 
             id: true,
             name: true,
             university: true,
+            country: true,
             intakes: true,
             addresses: {
                 include: {

@@ -25,11 +25,14 @@ model Country {
   name            String        @unique
   description     String?
   universities    University[]
+  courses    Course[]
   leads           Lead[]
   createdAt       DateTime      @default(now()) // Add createdAt field
   updatedAt       DateTime      @updatedAt // Add updatedAt field
   applications    Application[]
   visaStatusLists VisaStatus[]
+  currencyCode  String? @unique
+  currency  Currency?  @relation(fields: [currencyCode], references: [code])
 }
 
 model UniversityRequirement {
@@ -86,16 +89,19 @@ model Currency {
   code  String @unique
 
   courses Course[]
+  country Country[]
 }
 model Course {
   id           Int             @id @default(autoincrement())
   name         String
+  countryId         Int
   universityId Int
   description String?
 
   courseField String?
   courseLevel String?
   university   University      @relation(fields: [universityId], references: [id])
+  country   Country      @relation(fields: [countryId], references: [id])
   addresses    AddressCourse[]
   applications Application[]
   intakes      Int[]
