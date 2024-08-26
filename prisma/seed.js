@@ -125,6 +125,6 @@ const migrate = () => __awaiter(void 0, void 0, void 0, function* () {
     yield Seed.createCourseFields();
     yield Seed.createCourseLevels();
     yield Seed.createAdmin();
-    yield Seed.createCurrencies();
+    // await Seed.createCurrencies()
 });
 migrate();
