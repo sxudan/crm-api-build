@@ -15,8 +15,7 @@
     "prisma:db-reset": "npx prisma db push --force-reset",
     "build": "tsc --project tsconfig.json",
     "validate": "prettier ./src --check && tsc -project tsconfig.json",
-    "validate-fix": "prettier ./src --write && tsc -project tsconfig.json",
-    "postinstall": "prisma generate"
+    "validate-fix": "prettier ./src --write && tsc -project tsconfig.json"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
