@@ -71,7 +71,9 @@ exports.applicationRoutes.post('/uploadImage', multer_1.default.single('profileI
     try {
         const { applicationId } = req.body;
         const url = `${process.env.BASE_URL}/image/${(_a = req.file) === null || _a === void 0 ? void 0 : _a.filename}`;
-        yield (0, applicationController_1.updateProfileImage)(parseInt(applicationId), url);
+        if (applicationId) {
+            yield (0, applicationController_1.updateProfileImage)(parseInt(applicationId), url);
+        }
         res.status(200).json({ success: true, data: url });
     }
     catch (e) {

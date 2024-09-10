@@ -15,18 +15,7 @@ const time_1 = require("../utils/time");
 const leadController_1 = require("./leadController");
 const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        if (input.assignedTo && input.followUpDate) {
-            yield tx.task.create({
-                data: {
-                    name: `Follow up ${input.firstname} ${input.lastname}`,
-                    description: "",
-                    assignedToId: input.assignedTo,
-                    dueDate: input.followUpDate ? input.followUpDate : null,
-                },
-            });
-        }
-        yield tx.application.create({
+        const application = yield tx.application.create({
             data: {
                 firstname: input.firstname,
                 lastname: input.lastname,
@@ -48,10 +37,10 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
                 intake: input.intake,
                 year: input.year,
                 converted: converted,
-                followUpDate: (_a = input.followUpDate) !== null && _a !== void 0 ? _a : null,
+                followUpDate: input.followUpDate ? new Date(input.followUpDate) : undefined,
                 maritalStatus: input.maritalStatus,
                 spouseFullName: input.spouseFullName,
-                spouseDob: input.spouseDob,
+                spouseDob: input.spouseDob ? new Date(input.spouseDob) : undefined,
                 spouseHighestEducationLevel: input.spouseHighestEducationLevel,
                 accompanying: input.accompanying,
                 previousHighestEducationLevel: input.previousHighestEducationLevel,
@@ -66,8 +55,20 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
                 emergencyContactPhone: input.emergencyContactPhone,
                 emergencyContactEmail: input.emergencyContactEmail,
                 preferredCommunicationMethod: input.preferredCommunicationMethod,
+                profileImage: input.profileImage
             },
         });
+        if (input.assignedTo && input.followUpDate) {
+            yield tx.task.create({
+                data: {
+                    name: `Follow up ${input.firstname} ${input.lastname}`,
+                    description: "",
+                    assignedToId: input.assignedTo,
+                    dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
+                    applicationId: application.id
+                },
+            });
+        }
     }));
 });
 exports.addApplicant = addApplicant;
@@ -130,7 +131,7 @@ const updateApplicantStatus = (applicantId, statusId) => __awaiter(void 0, void 
 });
 exports.updateApplicantStatus = updateApplicantStatus;
 const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c, _d, _e;
+    var _a, _b;
     // Fetch the existing lead to ensure it exists
     const existingLead = yield prisma_1.prisma.application.findUnique({
         where: { id: input.id },
@@ -146,24 +147,24 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                     lastname: input.lastname,
                     email: input.email,
                     phone: input.phone,
-                    dob: (_b = input.dob) !== null && _b !== void 0 ? _b : Date.now(),
+                    dob: new Date(input.dob),
                     passportCountry: input.passportCountry,
                     countryId: input.countryId,
-                    description: (_c = input.description) !== null && _c !== void 0 ? _c : "",
+                    description: (_a = input.description) !== null && _a !== void 0 ? _a : "",
                     intake: input.intake,
                     year: input.year,
                     courseId: input.courseId,
                     universityId: input.universityId,
                     universityLongAddressId: input.universityLongAddressId,
                     leadId: input.leadId,
-                    isDirect: (_d = input.isDirect) !== null && _d !== void 0 ? _d : true,
+                    isDirect: (_b = input.isDirect) !== null && _b !== void 0 ? _b : true,
                     referer: input.referer,
                     statusId: input.statusId,
                     subagentId: input.subagentId,
-                    followUpDate: (_e = input.followUpDate) !== null && _e !== void 0 ? _e : null,
+                    followUpDate: input.followUpDate ? new Date(input.followUpDate) : undefined,
                     maritalStatus: input.maritalStatus,
                     spouseFullName: input.spouseFullName,
-                    spouseDob: input.spouseDob,
+                    spouseDob: input.spouseDob ? new Date(input.spouseDob) : undefined,
                     spouseHighestEducationLevel: input.spouseHighestEducationLevel,
                     accompanying: input.accompanying,
                     previousHighestEducationLevel: input.previousHighestEducationLevel,
@@ -197,31 +198,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
         throw new Error(`Lead with id ${input.id} does not exist.`);
     }
     prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _f, _g;
-        const taskId = (_f = existingLead.task) === null || _f === void 0 ? void 0 : _f.id;
-        if (taskId) {
-            tx.task.update({
-                where: {
-                    id: taskId,
-                },
-                data: {
-                    assignedToId: input.assignedTo,
-                    dueDate: input.followUpDate ? input.followUpDate : null,
-                },
-            });
-        }
-        else {
-            if (input.assignedTo && input.followUpDate) {
-                yield tx.task.create({
-                    data: {
-                        name: `Follow up ${input.firstname} ${input.lastname}`,
-                        description: "",
-                        assignedToId: input.assignedTo,
-                        dueDate: input.followUpDate ? input.followUpDate : null,
-                    },
-                });
-            }
-        }
+        var _c;
         // Update the lead details
         yield tx.application.update({
             where: { id: input.id },
@@ -243,10 +220,10 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                 subAgentId: input.subagentId,
                 universityLongAddressId: input.universityLongAddressId,
                 year: input.year,
-                followUpDate: (_g = input.followUpDate) !== null && _g !== void 0 ? _g : null,
+                followUpDate: input.followUpDate ? new Date(input.followUpDate) : undefined,
                 maritalStatus: input.maritalStatus,
                 spouseFullName: input.spouseFullName,
-                spouseDob: input.spouseDob,
+                spouseDob: input.spouseDob ? new Date(input.spouseDob) : undefined,
                 spouseHighestEducationLevel: input.spouseHighestEducationLevel,
                 accompanying: input.accompanying,
                 previousHighestEducationLevel: input.previousHighestEducationLevel,
@@ -263,6 +240,33 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                 preferredCommunicationMethod: input.preferredCommunicationMethod,
             },
         });
+        let taskId = (_c = existingLead.task) === null || _c === void 0 ? void 0 : _c.id;
+        if (taskId) {
+            console.log('assigned to', input.assignedTo);
+            yield tx.task.update({
+                where: {
+                    id: taskId,
+                },
+                data: {
+                    assignedToId: input.assignedTo,
+                    dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
+                    applicationId: input.id
+                },
+            });
+        }
+        else {
+            if (input.assignedTo && input.followUpDate) {
+                const task = yield tx.task.create({
+                    data: {
+                        name: `Follow up ${input.firstname} ${input.lastname}`,
+                        description: "",
+                        assignedToId: input.assignedTo,
+                        dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
+                        applicationId: input.id
+                    },
+                });
+            }
+        }
     }));
 });
 exports.updateApplicant = updateApplicant;
@@ -278,6 +282,7 @@ const getApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
             visaStatus: true,
             subAgent: true,
             universityLongAddress: true,
+            task: true
         },
     });
 });
@@ -292,6 +297,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 visaStatus: true,
                 subAgent: true,
                 universityLongAddress: true,
+                task: true
             },
             orderBy: {
                 updatedAt: "desc",

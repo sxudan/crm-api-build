@@ -77,3 +77,53 @@ exports.courseRoutes.get("/courseLevels", (req, res, next) => __awaiter(void 0, 
         next(e);
     }
 }));
+// new
+// courseRoutes.post("/courseFields/add", async (req, res, next) => {
+//   try {
+//     // const data = req.body as NameC
+//     // const fields = await addCourseField()
+//     res.status(200).send({ success: true, data: fields });
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+// courseRoutes.post("/courseLevels/add", async (req, res, next) => {
+//   try {
+//     const fields = await fetchGetCourseLevels()
+//     res.status(200).send({ success: true, data: fields });
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+// courseRoutes.put("/courseFields/update", async (req, res, next) => {
+//   try {
+//     const fields = await fetchGetCourseFields()
+//     res.status(200).send({ success: true, data: fields });
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+// courseRoutes.put("/courseLevels/update", async (req, res, next) => {
+//   try {
+//     const fields = await fetchGetCourseLevels()
+//     res.status(200).send({ success: true, data: fields });
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+// courseRoutes.delete("/courseFields/delete", async (req, res, next) => {
+//   try {
+//     const fields = await fetchGetCourseFields()
+//     res.status(200).send({ success: true, data: fields });
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+// courseRoutes.delete("/courseLevels/delete", async (req, res, next) => {
+//   try {
+//     const fields = await fetchGetCourseLevels()
+//     res.status(200).send({ success: true, data: fields });
+//   } catch (e) {
+//     next(e);
+//   }
+// });

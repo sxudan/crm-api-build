@@ -94,7 +94,7 @@ const Seed = {
         });
     }),
     createCourseLevels: () => __awaiter(void 0, void 0, void 0, function* () {
-        const levels = ["Masters by Research", "Masters", "Bachelors", "Diploma"];
+        const levels = ["Masters by Research", "Masters", "Bachelors", "Diploma", "Year 12", "A Levels"];
         yield prisma_1.prisma.courseLevel.createMany({
             data: levels.map((field) => ({ name: field })),
         });
@@ -114,17 +114,23 @@ const Seed = {
         yield prisma_1.prisma.currency.createMany({
             data: currencies
         });
+    }),
+    addExtraLevels: () => __awaiter(void 0, void 0, void 0, function* () {
+        const levels = ["Year 12", "A Levels"];
+        yield prisma_1.prisma.courseLevel.createMany({
+            data: levels.map((field) => ({ name: field }))
+        });
     })
 };
 const migrate = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("migrating....");
     // await Seed.createRoles();
-    yield Seed.createLanguageTypes();
-    yield Seed.createAdmissionTypes();
-    yield Seed.createAddress_Branch();
-    yield Seed.createCourseFields();
-    yield Seed.createCourseLevels();
-    yield Seed.createAdmin();
-    // await Seed.createCurrencies()
+    // await Seed.createLanguageTypes();
+    // await Seed.createAdmissionTypes();
+    // await Seed.createAddress_Branch();
+    // await Seed.createCourseFields();
+    // await Seed.createCourseLevels();
+    // await Seed.createAdmin()
+    yield Seed.addExtraLevels();
 });
 migrate();

@@ -40,7 +40,7 @@ const addLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
                     leadId: lead.id,
                     name: `Follow up ${input.firstname} ${input.lastname}`,
                     description: "",
-                    dueDate: input.followUpDate ? input.followUpDate : null,
+                    dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
                     assignedToId: input.assignedTo,
                 },
             });
@@ -84,7 +84,7 @@ const updateLead = (input) => __awaiter(void 0, void 0, void 0, function* () {
                         name: `Follow up ${input.firstname} ${input.lastname}`,
                         description: "",
                         assignedToId: input.assignedTo,
-                        dueDate: input.followUpDate ? input.followUpDate : null,
+                        dueDate: input.followUpDate ? new Date(input.followUpDate) : null,
                         leadId: input.id,
                     },
                 });

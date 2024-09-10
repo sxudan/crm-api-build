@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.deleteUser = exports.getUser = exports.getAllUsers = exports.addUser = void 0;
+exports.updateProfileImage = exports.updateUser = exports.deleteUser = exports.getUser = exports.getAllUsers = exports.addUser = void 0;
 const prisma_1 = require("../prisma");
 const crypto_1 = __importDefault(require("crypto"));
 const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
@@ -64,6 +64,7 @@ const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
                 employmentDepartment: user.employmentDepartment,
                 employmentDateOfJoining: user.employmentDateOfJoining ? new Date(user.employmentDateOfJoining) : undefined,
                 employmentEmployeeId: user.employmentEmployeeId,
+                profileImage: user.profileImage
             },
         });
         const admin = {
@@ -92,12 +93,24 @@ const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
             employmentDepartment: user.employmentDepartment,
             employmentDateOfJoining: user.employmentDateOfJoining ? new Date(user.employmentDateOfJoining) : undefined,
             employmentEmployeeId: user.employmentEmployeeId,
+            profileImage: user.profileImage
         };
         return admin;
     }));
     return admin;
 });
 exports.addUser = addUser;
+const updateProfileImage = (profileId, profileImagePath) => __awaiter(void 0, void 0, void 0, function* () {
+    yield prisma_1.prisma.profile.update({
+        where: {
+            id: profileId
+        },
+        data: {
+            profileImage: profileImagePath
+        }
+    });
+});
+exports.updateProfileImage = updateProfileImage;
 const updateUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         var _b;
@@ -169,6 +182,11 @@ const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUser = getUser;
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const profile = yield tx.profile.findUnique({
+            where: {
+                id: id
+            }
+        });
         yield tx.profile.delete({
             where: {
                 id: id,
@@ -176,9 +194,7 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
         });
         yield tx.user.deleteMany({
             where: {
-                profile: {
-                    id: id
-                }
+                id: profile === null || profile === void 0 ? void 0 : profile.userId
             },
         });
     }));
