@@ -124,13 +124,11 @@ const Seed = {
 };
 const migrate = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("migrating....");
-    // await Seed.createRoles();
-    // await Seed.createLanguageTypes();
-    // await Seed.createAdmissionTypes();
-    // await Seed.createAddress_Branch();
-    // await Seed.createCourseFields();
-    // await Seed.createCourseLevels();
-    // await Seed.createAdmin()
-    yield Seed.addExtraLevels();
+    yield Seed.createLanguageTypes();
+    yield Seed.createAdmissionTypes();
+    yield Seed.createAddress_Branch();
+    yield Seed.createCourseFields();
+    yield Seed.createCourseLevels();
+    yield Seed.createAdmin();
 });
 migrate();

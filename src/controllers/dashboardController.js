@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDashboardData = void 0;
+exports.getDashboardDataByCountry = exports.getDashboardData = void 0;
 const applicationController_1 = require("./applicationController");
 const leadController_1 = require("./leadController");
 const visaStatusController_1 = require("./visaStatusController");
@@ -35,3 +35,25 @@ const getDashboardData = () => __awaiter(void 0, void 0, void 0, function* () {
     };
 });
 exports.getDashboardData = getDashboardData;
+const getDashboardDataByCountry = (countryId) => __awaiter(void 0, void 0, void 0, function* () {
+    const statuses = (yield (0, visaStatusController_1.getVisaStatuses)()).filter(x => x.name.toLowerCase() === 'visa granted' || x.name.toLowerCase() === 'visa grant').map(x => x.id);
+    return {
+        leads: {
+            total: yield (0, leadController_1.getLeadCount)(undefined, countryId),
+            thisMonth: yield (0, leadController_1.getLeadCount)(new Date())
+        },
+        applicants: {
+            total: yield (0, applicationController_1.getApplicationCount)(undefined, undefined, countryId),
+            thisMonth: yield (0, applicationController_1.getApplicationCount)(new Date(), undefined, countryId),
+        },
+        languages: {
+            total: 0,
+            thisMonth: 0,
+        },
+        visaGranted: {
+            total: yield (0, applicationController_1.getApplicationCount)(undefined, statuses, countryId),
+            thisMonth: yield (0, applicationController_1.getApplicationCount)(new Date(), statuses, countryId),
+        }
+    };
+});
+exports.getDashboardDataByCountry = getDashboardDataByCountry;

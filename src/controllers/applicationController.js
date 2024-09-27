@@ -30,6 +30,7 @@ const addApplicant = (input, converted) => __awaiter(void 0, void 0, void 0, fun
                 archived: false,
                 passportCountry: input.passportCountry,
                 referer: input.referer,
+                appliedViaId: input.appliedViaId,
                 dob: new Date(input.dob),
                 isDirect: input.isDirect,
                 subAgentId: input.subagentId,
@@ -167,6 +168,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                     spouseDob: input.spouseDob ? new Date(input.spouseDob) : undefined,
                     spouseHighestEducationLevel: input.spouseHighestEducationLevel,
                     accompanying: input.accompanying,
+                    appliedViaId: input.appliedViaId,
                     previousHighestEducationLevel: input.previousHighestEducationLevel,
                     previousCourseName: input.previousCourseName,
                     previousYearOfGraduation: input.previousYearOfGraduation,
@@ -218,6 +220,7 @@ const updateApplicant = (input) => __awaiter(void 0, void 0, void 0, function* (
                 referer: input.referer,
                 isDirect: input.isDirect,
                 subAgentId: input.subagentId,
+                appliedViaId: input.appliedViaId,
                 universityLongAddressId: input.universityLongAddressId,
                 year: input.year,
                 followUpDate: input.followUpDate ? new Date(input.followUpDate) : undefined,
@@ -282,7 +285,8 @@ const getApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
             visaStatus: true,
             subAgent: true,
             universityLongAddress: true,
-            task: true
+            task: true,
+            appliedVia: true,
         },
     });
 });
@@ -297,7 +301,8 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
                 visaStatus: true,
                 subAgent: true,
                 universityLongAddress: true,
-                task: true
+                task: true,
+                appliedVia: true,
             },
             orderBy: {
                 updatedAt: "desc",
@@ -337,6 +342,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
         isDirect: true,
         referer: "",
         subAgentId: null,
+        appliedViaId: null,
         country: {
             id: undefined,
             name: undefined,
@@ -368,6 +374,7 @@ const getApplicants = () => __awaiter(void 0, void 0, void 0, function* () {
             countryId: undefined,
         },
         subAgent: null,
+        appliedVia: null,
     }));
     return [...converted, ...leads];
 });
@@ -382,16 +389,16 @@ const deleteApplicant = (id) => __awaiter(void 0, void 0, void 0, function* () {
     }));
 });
 exports.deleteApplicant = deleteApplicant;
-const getApplicationCount = (date, visaStatusIds) => __awaiter(void 0, void 0, void 0, function* () {
+const getApplicationCount = (date, visaStatusIds, countryId) => __awaiter(void 0, void 0, void 0, function* () {
     if (!date) {
         // If no date is provided, return the count of all leads
         return yield prisma_1.prisma.application.count({
-            where: Object.assign({}, (visaStatusIds &&
+            where: Object.assign(Object.assign({}, (visaStatusIds &&
                 visaStatusIds.length > 0 && {
                 OR: visaStatusIds.map((id) => ({
                     visaStatusId: id,
                 })),
-            })),
+            })), { countryId: countryId }),
         });
     }
     const { startOfMonth, endOfMonth } = (0, time_1.getStartAndEnd)(date);

@@ -22,3 +22,13 @@ exports.dashboardRoutes.get("/", (req, res, next) => __awaiter(void 0, void 0, v
         next(e);
     }
 }));
+exports.dashboardRoutes.get("/country/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield (0, dashboardController_1.getDashboardDataByCountry)(parseInt(id));
+        res.status(200).send({ success: true, data: result });
+    }
+    catch (e) {
+        next(e);
+    }
+}));

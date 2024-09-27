@@ -207,7 +207,7 @@ const deleteLead = (id) => __awaiter(void 0, void 0, void 0, function* () {
     }));
 });
 exports.deleteLead = deleteLead;
-const getLeadCount = (date) => __awaiter(void 0, void 0, void 0, function* () {
+const getLeadCount = (date, countryId) => __awaiter(void 0, void 0, void 0, function* () {
     if (!date) {
         // If no date is provided, return the count of all leads
         return yield prisma_1.prisma.lead.count();
@@ -219,6 +219,7 @@ const getLeadCount = (date) => __awaiter(void 0, void 0, void 0, function* () {
                 gte: startOfMonth,
                 lte: endOfMonth,
             },
+            countryId: countryId
         },
     });
 });

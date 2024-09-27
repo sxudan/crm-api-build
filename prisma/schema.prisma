@@ -13,7 +13,7 @@ generator client {
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 // datasource db {
@@ -536,7 +536,9 @@ model Application {
   isDirect     Boolean
   referer      String?
   subAgentId   Int?
-  subAgent     SubAgent?  @relation(fields: [subAgentId], references: [id])
+  subAgent     SubAgent?  @relation(name: "subAgent", fields: [subAgentId], references: [id])
+  appliedViaId  Int?
+  appliedVia  SubAgent? @relation(name: "appliedVia", fields: [appliedViaId], references: [id])
   converted    Boolean    @default(false)
   task         Task?
 
@@ -583,5 +585,6 @@ model SubAgent {
   companyAddress     String
   companyEmail       String
   companyPhone       String
-  applications       Application[]
+  application Application[] @relation(name: "subAgent")
+  applicationAsAppliedVia Application[] @relation(name: "appliedVia")
 }
